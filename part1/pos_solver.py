@@ -22,25 +22,40 @@ class Solver:
     # Calculate the log of the posterior probability of a given sentence
     #  with a given part-of-speech labeling. Right now just returns -999 -- fix this!
     def posterior(self, model, sentence, label):
+        print("The label value is ",label)
         if model == "Simple":
             print(sentence)
-
-            print("The type of sentence is ", type(sentence))
+            self.pos_of_sentence=[]
+            # print("The type of sentence is ", type(sentence))
 
             for word in sentence:
                 word_prob={'ADJ':0, 'ADV': 0, 'ADP':0, 'CONJ':0, 'DET':0, 'NOUN':0, 'NUM':0, 'PRON':0,'PRT':0, 'VERB':0, 'X':0,'.':0 }
-                print("Word in Sentence is :",word)
+                # print("Word in Sentence is :",word)
                 for pos in self.pos_prob.keys():
                     if word in self.pos_word_prob[pos].keys():
                         word_prob[pos]=self.pos_word_prob[pos][word]*self.pos_prob[pos]
                     else:
                          word_prob[pos]=0
-                print("The word is ", word)
-                print(word_prob)
+                # print("The word is ", word)
+                # print(word_prob)
+                max_prob=0
+                for each in word_prob.keys():
+                    if word_prob[each]>=max_prob:
+                        max_prob=word_prob[each]
+                        pos_of_word= each
+                # print(pos_of_word)
+                self.pos_of_sentence.append(pos_of_word)
+            print(self.pos_of_sentence)
+
+            
+            # # Throwing an Zero Division Error So that code stops ( Please Remove this before the submission)
+            # print(25/0)
 
 
-            # Throwing an Zero Division Error So that code stops ( Please Remove this before the submission)
-            print(25/0)
+            return self.pos_of_sentence
+
+
+
 
             return -999
         elif model == "HMM":
@@ -54,40 +69,33 @@ class Solver:
     #
     def train(self, data):
         print(len(data))
-
-        ## Readin the training data 
-        with open('bc.train', "r") as f:
-            f_contents = f.readlines()
-
-        # Creating a dictionary that has parts of speech ( ADV, VERB etc.,) as keys and their count as the values:
-        # pos_count={'ADJ':0, 'ADV': 0, 'ADP':0, 'CONJ':0, 'DET':0, 'NOUN':0, 'NUM':0, 'PRON':0,'PRT':0, 'VERB':0, 'X':0,'.':0 }
         pos_count={}
 
         # Creating a dictionary that has parts of speech as keys  ad values are again dictionaries ( This dictionary has the words as the keys and the values will be their count of given word for the given parts of speech )
         pos_word_count={}
 
         ## The following loop updates the POS count  and POS_WORD_COUNT
-        for i in range(len(f_contents)):
+        for i in range(len(data)):
  
-            line= f_contents[i].split()
-            for j in range(len(line)//2):
+            line= data[i]
+            for j in range(len(line[0])):
 
                 ## Updating Parts of Speech Count #############
-                if line[j*2+1] in pos_count.keys():
-                    pos_count[line[j*2+1]] += 1
+                if line[1][j] in pos_count.keys():
+                    pos_count[line[1][j]] += 1
                 else:
-                    pos_count[line[j*2+1]] = 1
+                    pos_count[line[1][j]] = 1
                 
                 ## Updating Parts of Speech Word Count ##############
 
-                if line[j*2+1] in pos_word_count.keys():
-                    if line[j*2] in  pos_word_count[line[j*2+1]].keys():
-                        pos_word_count[line[j*2+1]][line[j*2]]+=1
+                if line[1][j] in pos_word_count.keys():
+                    if line[0][j] in  pos_word_count[line[1][j]].keys():
+                        pos_word_count[line[1][j]][line[0][j]]+=1
                     else:
-                        pos_word_count[line[j*2+1]][line[j*2]] = 1
+                        pos_word_count[line[1][j]][line[0][j]]=1
                 else:
-                    pos_word_count[line[j*2+1]]={}
-                    pos_word_count[line[j*2+1]][line[j*2]] = 1
+                    pos_word_count[line[1][j]]={}
+                    pos_word_count[line[1][j]][line[0][j]]=1
         
         #Get the prior proabailites for the Parts of Speech:
         self.pos_prob={}
@@ -98,13 +106,12 @@ class Solver:
         for pos in pos_count.keys():
             count= count+pos_count[pos]
             
-            ## Using teh count obatined in the previous step, divide each value of pos_count dictionary to get the probability
+            ## Using the count obatined in the previous step, divide each value of pos_count dictionary to get the probability
         for pos in pos_count.keys():
             self.pos_prob[pos]=pos_count[pos]/count
-
-
+       
         #Get the prior proabailites (Likelihood Values) for the Parts of Speech:
-        self.pos_word_prob={'ADJ':{}, 'ADV': {}, 'ADP':{}, 'CONJ':{}, 'DET':{}, 'NOUN':{}, 'NUM':{}, 'PRON':{},'PRT':{}, 'VERB':{}, 'X':{},'.':{} }
+        self.pos_word_prob={'adj':{}, 'adv': {}, 'adp':{}, 'conj':{}, 'det':{}, 'noun':{}, 'num':{}, 'pron':{},'prt':{}, 'verb':{}, 'x':{},'.':{} }
        
             ## Using the count from pos_count dictionary we will get the likelihood values
         for pos in pos_word_count.keys():
@@ -117,7 +124,7 @@ class Solver:
         print(self.pos_prob)
         print("__"*50)
 
-        #Validation 
+        # Validation 
         # Run the following code if you wan to check is the count of wrods in pos_count is equal to pos_word_count
         # for each in pos_word_count.keys():
         #     word_count=0
@@ -133,8 +140,8 @@ class Solver:
     # Functions for each algorithm. Right now this just returns nouns -- fix this!
     #
     def simplified(self, sentence):
-        self.train("pradeep")
-        return [ "noun" ] * len(sentence)
+
+        return self.posterior("Simple",sentence,)
 
     def hmm_viterbi(self, sentence):
         return [ "noun" ] * len(sentence)
