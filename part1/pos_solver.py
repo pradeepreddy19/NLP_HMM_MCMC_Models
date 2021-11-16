@@ -22,10 +22,11 @@ class Solver:
     # Calculate the log of the posterior probability of a given sentence
     #  with a given part-of-speech labeling. Right now just returns -999 -- fix this!
     def posterior(self, model, sentence, label):
-        print("The label value is ",label)
+        # print("The label value is ",label)
         if model == "Simple":
-            print(sentence)
+            # print(sentence)
             self.pos_of_sentence=[]
+            self.pos_prob_of_sentece=[]
             # print("The type of sentence is ", type(sentence))
 
             for word in sentence:
@@ -36,27 +37,14 @@ class Solver:
                         word_prob[pos]=self.pos_word_prob[pos][word]*self.pos_prob[pos]
                     else:
                          word_prob[pos]=0
-                # print("The word is ", word)
-                # print(word_prob)
-                max_prob=0
-                for each in word_prob.keys():
-                    if word_prob[each]>=max_prob:
-                        max_prob=word_prob[each]
-                        pos_of_word= each
-                # print(pos_of_word)
-                self.pos_of_sentence.append(pos_of_word)
-            print(self.pos_of_sentence)
+
+                self.pos_prob_of_sentece.append(max(word_prob.values()))
+            
+            return( sum([math.log(x) for x in self.pos_prob_of_sentece if x!=0]))
 
             
             # # Throwing an Zero Division Error So that code stops ( Please Remove this before the submission)
             # print(25/0)
-
-
-            return self.pos_of_sentence
-
-
-
-
             return -999
         elif model == "HMM":
             return -999
@@ -120,9 +108,9 @@ class Solver:
             for word in pos_word_count[pos].keys():
                 self.pos_word_prob[pos][word]=pos_word_count[pos][word]/count
 
-        print(pos_count)
-        print(self.pos_prob)
-        print("__"*50)
+        # print(pos_count)
+        # print(self.pos_prob)
+        # print("__"*50)
 
         # Validation 
         # Run the following code if you wan to check is the count of wrods in pos_count is equal to pos_word_count
@@ -140,9 +128,32 @@ class Solver:
     # Functions for each algorithm. Right now this just returns nouns -- fix this!
     #
     def simplified(self, sentence):
+        
 
-        return self.posterior("Simple",sentence,)
+        # print(sentence)
+        self.pos_of_sentence=[]
+        # print("The type of sentence is ", type(sentence))
 
+        for word in sentence:
+            word_prob={'ADJ':0, 'ADV': 0, 'ADP':0, 'CONJ':0, 'DET':0, 'NOUN':0, 'NUM':0, 'PRON':0,'PRT':0, 'VERB':0, 'X':0,'.':0 }
+            # print("Word in Sentence is :",word)
+            for pos in self.pos_prob.keys():
+                if word in self.pos_word_prob[pos].keys():
+                    word_prob[pos]=self.pos_word_prob[pos][word]*self.pos_prob[pos]
+                else:
+                        word_prob[pos]=0
+            # print("The word is ", word)
+            # print(word_prob)
+            max_prob=0
+            for each in word_prob.keys():
+                if word_prob[each]>=max_prob:
+                    max_prob=word_prob[each]
+                    pos_of_word= each
+            # print(pos_of_word)
+            self.pos_of_sentence.append(pos_of_word)
+
+        return self.pos_of_sentence
+        
     def hmm_viterbi(self, sentence):
         return [ "noun" ] * len(sentence)
 
