@@ -2,6 +2,9 @@
 # CS B551 Spring 2021, Assignment #3
 #
 # Your names and user ids:
+# harmohan -- Harini Mohansundaram 
+# jzayatz  -- Joy Zayatz
+# prokkam  -- Pradeep Reddy Rokkam
 #
 # (Based on skeleton code by D. Crandall)
 #
@@ -20,6 +23,25 @@ class Solver:
     #  with a given part-of-speech labeling. Right now just returns -999 -- fix this!
     def posterior(self, model, sentence, label):
         if model == "Simple":
+            print(sentence)
+
+            print("The type of sentence is ", type(sentence))
+
+            for word in sentence:
+                word_prob={'ADJ':0, 'ADV': 0, 'ADP':0, 'CONJ':0, 'DET':0, 'NOUN':0, 'NUM':0, 'PRON':0,'PRT':0, 'VERB':0, 'X':0,'.':0 }
+                print("Word in Sentence is :",word)
+                for pos in self.pos_prob.keys():
+                    if word in self.pos_word_prob[pos].keys():
+                        word_prob[pos]=self.pos_word_prob[pos][word]*self.pos_prob[pos]
+                    else:
+                         word_prob[pos]=0
+                print("The word is ", word)
+                print(word_prob)
+
+
+            # Throwing an Zero Division Error So that code stops ( Please Remove this before the submission)
+            print(25/0)
+
             return -999
         elif model == "HMM":
             return -999
@@ -31,11 +53,87 @@ class Solver:
     # Do the training!
     #
     def train(self, data):
-        pass
+        print(len(data))
+
+        ## Readin the training data 
+        with open('bc.train', "r") as f:
+            f_contents = f.readlines()
+
+        # Creating a dictionary that has parts of speech ( ADV, VERB etc.,) as keys and their count as the values:
+        # pos_count={'ADJ':0, 'ADV': 0, 'ADP':0, 'CONJ':0, 'DET':0, 'NOUN':0, 'NUM':0, 'PRON':0,'PRT':0, 'VERB':0, 'X':0,'.':0 }
+        pos_count={}
+
+        # Creating a dictionary that has parts of speech as keys  ad values are again dictionaries ( This dictionary has the words as the keys and the values will be their count of given word for the given parts of speech )
+        pos_word_count={}
+
+        ## The following loop updates the POS count  and POS_WORD_COUNT
+        for i in range(len(f_contents)):
+ 
+            line= f_contents[i].split()
+            for j in range(len(line)//2):
+
+                ## Updating Parts of Speech Count #############
+                if line[j*2+1] in pos_count.keys():
+                    pos_count[line[j*2+1]] += 1
+                else:
+                    pos_count[line[j*2+1]] = 1
+                
+                ## Updating Parts of Speech Word Count ##############
+
+                if line[j*2+1] in pos_word_count.keys():
+                    if line[j*2] in  pos_word_count[line[j*2+1]].keys():
+                        pos_word_count[line[j*2+1]][line[j*2]]+=1
+                    else:
+                        pos_word_count[line[j*2+1]][line[j*2]] = 1
+                else:
+                    pos_word_count[line[j*2+1]]={}
+                    pos_word_count[line[j*2+1]][line[j*2]] = 1
+        
+        #Get the prior proabailites for the Parts of Speech:
+        self.pos_prob={}
+
+            ## Get the overall pos count 
+        count=0
+        
+        for pos in pos_count.keys():
+            count= count+pos_count[pos]
+            
+            ## Using teh count obatined in the previous step, divide each value of pos_count dictionary to get the probability
+        for pos in pos_count.keys():
+            self.pos_prob[pos]=pos_count[pos]/count
+
+
+        #Get the prior proabailites (Likelihood Values) for the Parts of Speech:
+        self.pos_word_prob={'ADJ':{}, 'ADV': {}, 'ADP':{}, 'CONJ':{}, 'DET':{}, 'NOUN':{}, 'NUM':{}, 'PRON':{},'PRT':{}, 'VERB':{}, 'X':{},'.':{} }
+       
+            ## Using the count from pos_count dictionary we will get the likelihood values
+        for pos in pos_word_count.keys():
+            count= pos_count[pos]
+           
+            for word in pos_word_count[pos].keys():
+                self.pos_word_prob[pos][word]=pos_word_count[pos][word]/count
+
+        print(pos_count)
+        print(self.pos_prob)
+        print("__"*50)
+
+        #Validation 
+        # Run the following code if you wan to check is the count of wrods in pos_count is equal to pos_word_count
+        # for each in pos_word_count.keys():
+        #     word_count=0
+        #     for word in pos_word_count[each].keys():
+        #         word_count=word_count+pos_word_count[each][word]
+        #     print(each, ":", word_count)
+
+        
+            
+
+    
 
     # Functions for each algorithm. Right now this just returns nouns -- fix this!
     #
     def simplified(self, sentence):
+        self.train("pradeep")
         return [ "noun" ] * len(sentence)
 
     def hmm_viterbi(self, sentence):
