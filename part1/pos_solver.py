@@ -57,18 +57,18 @@ class Solver:
     #
     def train(self, data):
         print(len(data))
-        pos_count={}
+        self.pos_count={}
 
         # Creating a dictionary that has parts of speech as keys  ad values are again dictionaries (This dictionary has the words as the keys and the values will be their count of given word for the given parts of speech )
-        pos_word_count={}
+        self.pos_word_count={}
 
         # Creating a dictionary to capture the initial state i.e. The POS of the first word in each of the sentence
-        hmm_S0_count= {}
+        self.hmm_S0_count= {}
 
         # Creating a dictionary to capture the transition probilities for the state 
-        hmm_Si_to_Sj_count= {}
+        self.hmm_Si_to_Sj_count= {}
 
-        ## The following loop updates the POS count  and POS_WORD_COUNT
+        ## The following loop updates the POS count  and self.pos_word_count
         for i in range(len(data)):
 
             line= data[i]
@@ -79,61 +79,61 @@ class Solver:
 
                 ###The following if statement captures the S0 (State 0 - POS of te first word ) probabilities
                 if j==0:
-                    if line[1][0] in hmm_S0_count.keys():
-                        hmm_S0_count[line[1][0]] += 1
+                    if line[1][0] in self.hmm_S0_count.keys():
+                        self.hmm_S0_count[line[1][0]] += 1
                     else:
-                        hmm_S0_count[line[1][j]] = 1
+                        self.hmm_S0_count[line[1][j]] = 1
 
                  ###The following if statement captures the transition probabilities
 
                 else:
-                    if line[1][j-1] in hmm_Si_to_Sj_count.keys():
-                        if line[1][j] in hmm_Si_to_Sj_count[line[1][j-1]].keys():
-                            hmm_Si_to_Sj_count[line[1][j-1]][line[1][j]] += 1
+                    if line[1][j-1] in self.hmm_Si_to_Sj_count.keys():
+                        if line[1][j] in self.hmm_Si_to_Sj_count[line[1][j-1]].keys():
+                            self.hmm_Si_to_Sj_count[line[1][j-1]][line[1][j]] += 1
                         else:
-                            hmm_Si_to_Sj_count[line[1][j-1]][line[1][j]] = 1
+                            self.hmm_Si_to_Sj_count[line[1][j-1]][line[1][j]] = 1
 
                     else:
-                        hmm_Si_to_Sj_count[line[1][j-1]]= {}
-                        hmm_Si_to_Sj_count[line[1][j-1]][line[1][j]] = 1                    
+                        self.hmm_Si_to_Sj_count[line[1][j-1]]= {}
+                        self.hmm_Si_to_Sj_count[line[1][j-1]][line[1][j]] = 1                    
 
                 #############################################
 
                 ## Updating Parts of Speech Count #############
-                if line[1][j] in pos_count.keys():
-                    pos_count[line[1][j]] += 1
+                if line[1][j] in self.pos_count.keys():
+                    self.pos_count[line[1][j]] += 1
                 else:
-                    pos_count[line[1][j]] = 1
+                    self.pos_count[line[1][j]] = 1
                 
                 ## Updating Parts of Speech Word Count ##############
 
-                if line[1][j] in pos_word_count.keys():
-                    if line[0][j] in  pos_word_count[line[1][j]].keys():
-                        pos_word_count[line[1][j]][line[0][j]]+=1
+                if line[1][j] in self.pos_word_count.keys():
+                    if line[0][j] in  self.pos_word_count[line[1][j]].keys():
+                        self.pos_word_count[line[1][j]][line[0][j]]+=1
                     else:
-                        pos_word_count[line[1][j]][line[0][j]]=1
+                        self.pos_word_count[line[1][j]][line[0][j]]=1
                 else:
-                    pos_word_count[line[1][j]]={}
-                    pos_word_count[line[1][j]][line[0][j]]=1
+                    self.pos_word_count[line[1][j]]={}
+                    self.pos_word_count[line[1][j]][line[0][j]]=1
         
         #### Get the initial state probabilties. This will be used in HMM and Viterbi 
-        hmm_S0_prob = {}
+        self.hmm_S0_prob = {}
 
-        total = sum(hmm_S0_count.values())
+        total = sum(self.hmm_S0_count.values())
 
-        for each in hmm_S0_count.keys():
-            hmm_S0_prob[each]=hmm_S0_count[each]/total
+        for each in self.hmm_S0_count.keys():
+            self.hmm_S0_prob[each]=self.hmm_S0_count[each]/total
 
         #### Get the transition probabailities for the states. This will be used in HMM and Viterbi 
-        hmm_Si_to_Sj_prob = {'adj':{}, 'adv': {}, 'adp':{}, 'conj':{}, 'det':{}, 'noun':{}, 'num':{}, 'pron':{},'prt':{}, 'verb':{}, 'x':{},'.':{} }
+        self.hmm_Si_to_Sj_prob = {'adj':{}, 'adv': {}, 'adp':{}, 'conj':{}, 'det':{}, 'noun':{}, 'num':{}, 'pron':{},'prt':{}, 'verb':{}, 'x':{},'.':{} }
 
-        for each in hmm_Si_to_Sj_count.keys():
+        for each in self.hmm_Si_to_Sj_count.keys():
 
-            total = sum(hmm_Si_to_Sj_count[each].values())
+            total = sum(self.hmm_Si_to_Sj_count[each].values())
     
 
-            for pos in hmm_Si_to_Sj_count[each].keys():
-                hmm_Si_to_Sj_prob[each][pos]=hmm_Si_to_Sj_count[each][pos]/total
+            for pos in self.hmm_Si_to_Sj_count[each].keys():
+                self.hmm_Si_to_Sj_prob[each][pos]=self.hmm_Si_to_Sj_count[each][pos]/total
 
         #Get the prior proabailites for the Parts of Speech:
         self.pos_prob={}
@@ -141,42 +141,41 @@ class Solver:
             ## Get the overall pos count 
         count=0
         
-        for pos in pos_count.keys():
-            count= count+pos_count[pos]
+        for pos in self.pos_count.keys():
+            count= count+self.pos_count[pos]
             
-            ## Using the count obatined in the previous step, divide each value of pos_count dictionary to get the probability
-        for pos in pos_count.keys():
-            self.pos_prob[pos]=pos_count[pos]/count
+            ## Using the count obatined in the previous step, divide each value of self.pos_count dictionary to get the probability
+        for pos in self.pos_count.keys():
+            self.pos_prob[pos]=self.pos_count[pos]/count
        
         #Get the prior proabailites (Likelihood Values) for the Parts of Speech:
         self.pos_word_prob={'adj':{}, 'adv': {}, 'adp':{}, 'conj':{}, 'det':{}, 'noun':{}, 'num':{}, 'pron':{},'prt':{}, 'verb':{}, 'x':{},'.':{} }
        
-            ## Using the count from pos_count dictionary we will get the likelihood values
-        for pos in pos_word_count.keys():
-            count= pos_count[pos]
+            ## Using the count from self.pos_count dictionary we will get the likelihood values
+        for pos in self.pos_word_count.keys():
+            count= self.pos_count[pos]
            
-            for word in pos_word_count[pos].keys():
-                self.pos_word_prob[pos][word]=pos_word_count[pos][word]/count
+            for word in self.pos_word_count[pos].keys():
+                self.pos_word_prob[pos][word]=self.pos_word_count[pos][word]/count
 
-        print(hmm_S0_prob)
-        # print(hmm_Si_to_Sj_prob)
-        for each in hmm_Si_to_Sj_count.keys():
-            print( each," : ", hmm_Si_to_Sj_count[each])
+        print(self.hmm_S0_prob)
+        # print(self.hmm_Si_to_Sj_prob)
+        for each in self.hmm_Si_to_Sj_count.keys():
+            print( each," : ", self.hmm_Si_to_Sj_count[each])
         print("__"*50)
-        for each in hmm_Si_to_Sj_prob.keys():
-            print( each," : ", hmm_Si_to_Sj_prob[each])
+        for each in self.hmm_Si_to_Sj_prob.keys():
+            print( each," : ", self.hmm_Si_to_Sj_prob[each])
 
-        print(25/0)
-        # print(pos_count)
+        # print(self.pos_count)
         # print(self.pos_prob)
         # print("__"*50)
 
         # Validation 
-        # Run the following code if you wan to check is the count of wrods in pos_count is equal to pos_word_count
-        # for each in pos_word_count.keys():
+        # Run the following code if you wan to check is the count of wrods in self.pos_count is equal to self.pos_word_count
+        # for each in self.pos_word_count.keys():
         #     word_count=0
-        #     for word in pos_word_count[each].keys():
-        #         word_count=word_count+pos_word_count[each][word]
+        #     for word in self.pos_word_count[each].keys():
+        #         word_count=word_count+self.pos_word_count[each][word]
         #     print(each, ":", word_count)
 
         
@@ -215,10 +214,66 @@ class Solver:
         
     def hmm_viterbi(self, sentence):
 
-        return [ "noun" ] * len(sentence)
+        # Using Viterbi algorithm to obtain the MAP ( Maximum A-Posteriori Probabilities) for the sentences. This will help us to get the most likely pos sequeneces given the observed words
+     
+        ## This involves 3 parts:
+            #1) Get all the probailities
+                # a) Transition probabilties (HMM State diagram)
+                # b) Initial state probabilities 
+                # c) Emisssion prababilties 
+            #2) Get the Maximum A-Posteriori Probabilties using the Viterbi Algorithm 
+            #3) Back track the states through which we were able to obtain this MAP, which will gives us the POS Sequence of the given words
 
-    def complex_mcmc(self, sentence):
-        return [ "noun" ] * len(sentence)
+        V_table = {}
+        # Creating a Viterbi table 
+        for s in self.hmm_S0_prob.keys():
+            V_table[s]=[0]*len(sentence)
+        
+        for s in self.hmm_S0_prob.keys():
+            if sentence[0] in self.pos_word_prob[s].keys():
+                V_table[s][0] = self.hmm_S0_prob[s] * self.pos_word_prob[s][sentence[0]]
+            else:
+                 V_table[s][0] = 0
+
+
+        print( V_table)
+        print(25/0)
+
+
+
+
+
+
+        
+# Here you'll have a loop to build up the viterbi table, left to right
+# for s in states:
+#     V_table[s][0] = initial[s] * emission[s][observed[0]]
+
+# for i in range(1, N):
+#     for s in states:
+#         (which_table[s][i], V_table[s][i]) =  max( [ (s0, V_table[s0][i-1] * trans[s0][s]) for s0 in states ], key=lambda l:l[1] ) 
+#         V_table[s][i] *= emission[s][observed[i]]
+
+# #       Easier to understand but longer version that does the same as the above two lines:
+# #        V_table[s][i] = emission[s][observed[i]]
+# #        if V_table["R"][i-1] * trans["R"][s] > V_table["S"][i-1] * V_table["S"][i-1] * trans["S"][s]:
+# #            V_table[s][i] *= V_table["R"][i-1] * trans["R"][s]
+# #            which_table[s][i] = "R"
+# #        else:
+# #            V_table[s][i] *= V_table["S"][i-1] * trans["S"][s]
+# #            which_table[s][i] = "S"
+
+# # Here you'll have a loop that backtracks to find the most likely state sequence
+# viterbi_seq = [""] * N
+# viterbi_seq[N-1] = "R" if V_table["R"][i] > V_table["S"][i] else "S"
+# for i in range(N-2, -1, -1):
+#     viterbi_seq[i] = which_table[viterbi_seq[i+1]][i+1]
+
+
+#         return [ "noun" ] * len(sentence)
+
+#     def complex_mcmc(self, sentence):
+#         return [ "noun" ] * len(sentence)
 
 
 
