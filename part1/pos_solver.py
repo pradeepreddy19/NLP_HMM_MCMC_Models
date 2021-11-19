@@ -59,7 +59,8 @@ class Solver:
         print(len(data))
         self.pos_count={}
 
-        # Creating a dictionary that has parts of speech as keys  ad values are again dictionaries (This dictionary has the words as the keys and the values will be their count of given word for the given parts of speech )
+
+        # Creating a dictionary that has parts of speech as keys and values are again dictionaries (This dictionary has the words as the keys and the values will be their count of given word for the given parts of speech )
         self.pos_word_count={}
 
         # Creating a dictionary to capture the initial state i.e. The POS of the first word in each of the sentence
@@ -99,13 +100,13 @@ class Solver:
 
                 #############################################
 
-                ## Updating Parts of Speech Count #############
+                ## Updating Parts of Speech Count (P(S)) #############
                 if line[1][j] in self.pos_count.keys():
                     self.pos_count[line[1][j]] += 1
                 else:
                     self.pos_count[line[1][j]] = 1
                 
-                ## Updating Parts of Speech Word Count ##############
+                ## Updating Parts of Speech Word Count ( P(W/S)) ##############
 
                 if line[1][j] in self.pos_word_count.keys():
                     if line[0][j] in  self.pos_word_count[line[1][j]].keys():
@@ -140,6 +141,7 @@ class Solver:
 
             ## Get the overall pos count 
         count=0
+
         
         for pos in self.pos_count.keys():
             count= count+self.pos_count[pos]
@@ -189,6 +191,7 @@ class Solver:
         
 
         # print(sentence)
+        # Sequence of pos for a sentence
         self.pos_of_sentence=[]
         # print("The type of sentence is ", type(sentence))
 
@@ -225,26 +228,78 @@ class Solver:
             #3) Back track the states through which we were able to obtain this MAP, which will gives us the POS Sequence of the given words
 
         V_table = {}
-        # Creating a Viterbi table 
+        which_table= {'adj':{}, 'adv': {}, 'adp':{}, 'conj':{}, 'det':{}, 'noun':{}, 'num':{}, 'pron':{},'prt':{}, 'verb':{}, 'x':{},'.':{} }
+        #Creating a Viterbi table 
         for s in self.hmm_S0_prob.keys():
             V_table[s]=[0]*len(sentence)
         
+        ## First lets use the mutliplication of prababilities, Next lets use the logarthmic values 
         for s in self.hmm_S0_prob.keys():
             if sentence[0] in self.pos_word_prob[s].keys():
-                V_table[s][0] = self.hmm_S0_prob[s] * self.pos_word_prob[s][sentence[0]]
+                V_table[s][0] =  self.hmm_S0_prob[s] * self.pos_word_prob[s][sentence[0]]
             else:
                  V_table[s][0] = 0
+        # print(sentence)
+
+        # for each in self.hmm_Si_to_Sj_prob.keys():
+        #     print(each, len(self.hmm_Si_to_Sj_prob[each]))
+        #     if len(self.hmm_Si_to_Sj_prob[each])!=12:
+        #         print(self.hmm_Si_to_Sj_prob[each])
 
 
-        print( V_table)
-        print(25/0)
+        for i in range(1,len(sentence)):
+            # print("The value of i is ",i)
+            for s in self.hmm_S0_prob.keys():
+                # print("The value of s is ",s)
+                
+                (which_table[s][i], V_table[s][i]) =  max( [ (s0, V_table[s0][i-1] * self.hmm_Si_to_Sj_prob[s0][s]) for s0 in self.hmm_S0_prob.keys() if  s in self.hmm_Si_to_Sj_prob[s0].keys() ], key=lambda l:l[1] ) 
+                if sentence[i] in self.pos_word_prob[s].keys():
+                    V_table[s][i] *= self.pos_word_prob[s][sentence[i]]
+                else:
+                     V_table[s][i]=0
 
 
+        # for  each in V_table:
+        #     print(V_table[each])
+
+        # print("Length of sentence ",len(sentence))
+        # print(sentence)
+        # print("WHich table ")
+        # for each in which_table:
+        #     print(each,":", which_table[each])
+
+        # Here you'll have a loop that backtracks to find the most likely state sequence
+        N= len(sentence)
+        viterbi_seq = [""] * N
+
+        ## The following for loop will the pos tagging for tha last word in sentence
+        prob=0
+        for s in self.hmm_S0_prob.keys():
+            new_prob=V_table[s][N-1]
+            if new_prob>=prob:
+                viterbi_seq[N-1]=s
+                prob=new_prob
+
+        # 
+        # print(which_table.keys())
+        for i in range(N-2, -1, -1):
+            viterbi_seq[i] = which_table[viterbi_seq[i+1]][i+1]
+        print(viterbi_seq)
+
+            
+                
+        # viterbi_seq[N-1] = "R" if V_table["R"][i] > V_table["S"][i] else "S"
+        # for i in range(N-2, -1, -1):
+        #     viterbi_seq[i] = which_table[viterbi_seq[i+1]][i+1]
+
+        # print(25/0)
 
 
+        return viterbi_seq
+
+      
 
 
-        
 # Here you'll have a loop to build up the viterbi table, left to right
 # for s in states:
 #     V_table[s][0] = initial[s] * emission[s][observed[0]]
@@ -270,10 +325,10 @@ class Solver:
 #     viterbi_seq[i] = which_table[viterbi_seq[i+1]][i+1]
 
 
-#         return [ "noun" ] * len(sentence)
+        
 
-#     def complex_mcmc(self, sentence):
-#         return [ "noun" ] * len(sentence)
+    def complex_mcmc(self, sentence):
+        return [ "noun" ] * len(sentence)
 
 
 
