@@ -236,9 +236,10 @@ class Solver:
         ## First lets use the mutliplication of prababilities, Next lets use the logarthmic values 
         for s in self.hmm_S0_prob.keys():
             if sentence[0] in self.pos_word_prob[s].keys():
-                V_table[s][0] =  self.hmm_S0_prob[s] * self.pos_word_prob[s][sentence[0]]
+                # print("used log1")
+                V_table[s][0] = - math.log( self.hmm_S0_prob[s] * self.pos_word_prob[s][sentence[0]] )
             else:
-                 V_table[s][0] = 0
+                 V_table[s][0] = -math.log(0.000000000001)
         # print(sentence)
 
         # for each in self.hmm_Si_to_Sj_prob.keys():
@@ -251,12 +252,12 @@ class Solver:
             # print("The value of i is ",i)
             for s in self.hmm_S0_prob.keys():
                 # print("The value of s is ",s)
-                
-                (which_table[s][i], V_table[s][i]) =  max( [ (s0, V_table[s0][i-1] * self.hmm_Si_to_Sj_prob[s0][s]) for s0 in self.hmm_S0_prob.keys() if  s in self.hmm_Si_to_Sj_prob[s0].keys() ], key=lambda l:l[1] ) 
+                # print("used log2")
+                (which_table[s][i], V_table[s][i]) =  min( [ (s0, V_table[s0][i-1] -math.log( self.hmm_Si_to_Sj_prob[s0][s])) for s0 in self.hmm_S0_prob.keys() if  s in self.hmm_Si_to_Sj_prob[s0].keys() ], key=lambda l:l[1] ) 
                 if sentence[i] in self.pos_word_prob[s].keys():
-                    V_table[s][i] *= self.pos_word_prob[s][sentence[i]]
+                    V_table[s][i] = V_table[s][i]-math.log( self.pos_word_prob[s][sentence[i]])
                 else:
-                     V_table[s][i]=0
+                    V_table[s][i]=V_table[s][i]-math.log(0.000000000001)
 
 
         # for  each in V_table:
@@ -273,10 +274,10 @@ class Solver:
         viterbi_seq = [""] * N
 
         ## The following for loop will the pos tagging for tha last word in sentence
-        prob=0
+        prob=V_table['noun'][N-1] ### You can take anything, I took noun
         for s in self.hmm_S0_prob.keys():
             new_prob=V_table[s][N-1]
-            if new_prob>=prob:
+            if new_prob<=prob:
                 viterbi_seq[N-1]=s
                 prob=new_prob
 
