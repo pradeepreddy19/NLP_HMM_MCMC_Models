@@ -12,6 +12,7 @@
 
 import random
 import math
+import copy
 
 
 # We've set up a suggested code structure, but feel free to change it. Just
@@ -63,11 +64,17 @@ class Solver:
         # Creating a dictionary that has parts of speech as keys and values are again dictionaries (This dictionary has the words as the keys and the values will be their count of given word for the given parts of speech )
         self.pos_word_count={}
 
+        # Creating a dictionary that has (parts of speech 1 and speech2)  as keys and values are again dictionaries (This dictionary has the words as the keys and the values will be their count of given word for the given parts of speech )
+        self.pos1_pos2_word_count={}
+
         # Creating a dictionary to capture the initial state i.e. The POS of the first word in each of the sentence
         self.hmm_S0_count= {}
 
-        # Creating a dictionary to capture the transition probilities for the state 
+        # HMM: Creating a dictionary to capture the transition probilities for the state  (For HMM. Next state depends only on the current state )
         self.hmm_Si_to_Sj_count= {}
+
+        #Complex: Creating a dictionary to capture the transition probabilities for the state ( For Complex model given: Next state depends not only on the current state and but also on the immediate past sate )
+        self.complex_Si_Si_1_to_Sj_count={}
 
         ## The following loop updates the POS count  and self.pos_word_count
         for i in range(len(data)):
@@ -96,17 +103,33 @@ class Solver:
 
                     else:
                         self.hmm_Si_to_Sj_count[line[1][j-1]]= {}
-                        self.hmm_Si_to_Sj_count[line[1][j-1]][line[1][j]] = 1                    
+                        self.hmm_Si_to_Sj_count[line[1][j-1]][line[1][j]] = 1   
+                ################################# Code for obataining the complex probabailities###################
+
+                if j>=2:
+                    _key= (line[1][j-2], line[1][j-1])
+                    _value= line[1][j]
+
+
+                    if _key in self.complex_Si_Si_1_to_Sj_count.keys():
+                        if _value in self.complex_Si_Si_1_to_Sj_count[_key].keys():
+                            self.complex_Si_Si_1_to_Sj_count[_key] [_value] +=1
+                        else:
+                            self.complex_Si_Si_1_to_Sj_count[_key] [_value] =1
+                    else:
+                        self.complex_Si_Si_1_to_Sj_count[_key]={}
+                        self.complex_Si_Si_1_to_Sj_count[_key] [_value]= 1
+               
 
                 #############################################
 
-                ## Updating Parts of Speech Count (P(S)) #############
+                ## Updating Parts of Speech Count (P(S))
                 if line[1][j] in self.pos_count.keys():
                     self.pos_count[line[1][j]] += 1
                 else:
                     self.pos_count[line[1][j]] = 1
                 
-                ## Updating Parts of Speech Word Count ( P(W/S)) ##############
+                ## Updating Parts of Speech Word Count ( P(W/S)) :: Used for HMM- Viterbi ##############
 
                 if line[1][j] in self.pos_word_count.keys():
                     if line[0][j] in  self.pos_word_count[line[1][j]].keys():
@@ -116,7 +139,20 @@ class Solver:
                 else:
                     self.pos_word_count[line[1][j]]={}
                     self.pos_word_count[line[1][j]][line[0][j]]=1
-        
+
+                ## Updating Parts of Speech Word Count ( P(W/(S1 and S2))) :: Used for Complex Model ##############
+                if j>=1:
+                    _pos_key=(line[1][j-1],line[1][j])
+                    _word = line[0][j]
+                    if _pos_key in self.pos1_pos2_word_count.keys():
+                        if _word in  self.pos1_pos2_word_count[_pos_key].keys():
+                            self.pos1_pos2_word_count[_pos_key][_word]+=1
+                        else:
+                            self.pos1_pos2_word_count[_pos_key][_word]=1
+                    else:
+                        self.pos1_pos2_word_count[_pos_key]={}
+                        self.pos1_pos2_word_count[_pos_key][_word]=1
+            
         #### Get the initial state probabilties. This will be used in HMM and Viterbi 
         self.hmm_S0_prob = {}
 
@@ -124,8 +160,8 @@ class Solver:
 
         for each in self.hmm_S0_count.keys():
             self.hmm_S0_prob[each]=self.hmm_S0_count[each]/total
-
-        #### Get the transition probabailities for the states. This will be used in HMM and Viterbi 
+        ##########################################################################################################
+        #### Get the transition probabailities for the states of HMM model. This will be used in HMM and Viterbi 
         self.hmm_Si_to_Sj_prob = {'adj':{}, 'adv': {}, 'adp':{}, 'conj':{}, 'det':{}, 'noun':{}, 'num':{}, 'pron':{},'prt':{}, 'verb':{}, 'x':{},'.':{} }
 
         for each in self.hmm_Si_to_Sj_count.keys():
@@ -135,6 +171,20 @@ class Solver:
 
             for pos in self.hmm_Si_to_Sj_count[each].keys():
                 self.hmm_Si_to_Sj_prob[each][pos]=self.hmm_Si_to_Sj_count[each][pos]/total
+        ###############################################################################################################
+        #### Get the transition probabilties for the states of Complex Model. This will be used in the Complex model (Gibbs Sampling)
+
+        self.complex_Si_Si_1_to_Sj_prob= copy.deepcopy( self.complex_Si_Si_1_to_Sj_count)
+
+        for each in self.complex_Si_Si_1_to_Sj_count.keys():
+
+            total = sum(self.complex_Si_Si_1_to_Sj_count[each].values())
+
+            for pos in self.complex_Si_Si_1_to_Sj_count[each].keys():
+                self.complex_Si_Si_1_to_Sj_prob[each][pos]=self.complex_Si_Si_1_to_Sj_count[each][pos]/total
+
+        #####################################################################################################################
+
 
         #Get the prior proabailites for the Parts of Speech:
         self.pos_prob={}
@@ -153,32 +203,55 @@ class Solver:
         #Get the prior proabailites (Likelihood Values) for the Parts of Speech:
         self.pos_word_prob={'adj':{}, 'adv': {}, 'adp':{}, 'conj':{}, 'det':{}, 'noun':{}, 'num':{}, 'pron':{},'prt':{}, 'verb':{}, 'x':{},'.':{} }
        
-            ## Using the count from self.pos_count dictionary we will get the likelihood values
+        ############### Using the count from self.pos_count dictionary we will get the likelihood values
         for pos in self.pos_word_count.keys():
             count= self.pos_count[pos]
            
             for word in self.pos_word_count[pos].keys():
                 self.pos_word_prob[pos][word]=self.pos_word_count[pos][word]/count
 
+        ##############
+       
+
+        self.pos1_pos2_word_prob= copy.deepcopy( self.pos1_pos2_word_count)
+
+        for each in self.pos1_pos2_word_count.keys():
+
+            total = sum(self.pos1_pos2_word_count[each].values())
+
+            for word in self.pos1_pos2_word_count[each].keys():
+                self.pos1_pos2_word_prob[each][word]=self.pos1_pos2_word_count[each][word]/total
+
         print(self.hmm_S0_prob)
         # print(self.hmm_Si_to_Sj_prob)
-        for each in self.hmm_Si_to_Sj_count.keys():
-            print( each," : ", self.hmm_Si_to_Sj_count[each])
-        print("__"*50)
-        for each in self.hmm_Si_to_Sj_prob.keys():
-            print( each," : ", self.hmm_Si_to_Sj_prob[each])
+        # for each in self.hmm_Si_to_Sj_count.keys():
+        #     print( each," : ", self.hmm_Si_to_Sj_count[each])
+        # print("__"*50)
+        # for each in self.hmm_Si_to_Sj_prob.keys():
+        #     print( each," : ", self.hmm_Si_to_Sj_prob[each])
 
         # print(self.pos_count)
         # print(self.pos_prob)
         # print("__"*50)
+        for each in self.complex_Si_Si_1_to_Sj_count:
+            print(each , "::", self.complex_Si_Si_1_to_Sj_count[each])
+            print(each , "::", self.complex_Si_Si_1_to_Sj_prob[each])
+        # # Validate the counts in complex transition dictionary
+        # validate_count=0
+        # for each in self.complex_Si_Si_1_to_Sj_count:
+        #     for i in self.complex_Si_Si_1_to_Sj_count[each]:
+        #         validate_count=validate_count+self.complex_Si_Si_1_to_Sj_count[each][i]
+        # print(validate_count)
 
+       
         # Validation 
         # Run the following code if you wan to check is the count of wrods in self.pos_count is equal to self.pos_word_count
         # for each in self.pos_word_count.keys():
         #     word_count=0
         #     for word in self.pos_word_count[each].keys():
         #         word_count=word_count+self.pos_word_count[each][word]
-        #     print(each, ":", word_count)
+            # print(each, ":", word_count)
+        # print(25/0)
 
         
             
@@ -202,10 +275,10 @@ class Solver:
                 if word in self.pos_word_prob[pos].keys():
                     word_prob[pos]=self.pos_word_prob[pos][word]*self.pos_prob[pos]
                 else:
-                        word_prob[pos]=0
+                        word_prob[pos]=0.0000000001
             # print("The word is ", word)
             # print(word_prob)
-            max_prob=0
+            max_prob=0.0000000001
             for each in word_prob.keys():
                 if word_prob[each]>=max_prob:
                     max_prob=word_prob[each]
@@ -285,7 +358,7 @@ class Solver:
         # print(which_table.keys())
         for i in range(N-2, -1, -1):
             viterbi_seq[i] = which_table[viterbi_seq[i+1]][i+1]
-        print(viterbi_seq)
+        # print(viterbi_seq)
 
             
                 
@@ -329,7 +402,105 @@ class Solver:
         
 
     def complex_mcmc(self, sentence):
-        return [ "noun" ] * len(sentence)
+
+        ## Lets generate large number of samples or particles (may be in thousands) for each sentence and once we generate them lets calculate the probability foe each of the words
+
+        sample_count= 20
+        
+        ## Lets create a dictionary of the dimensions that stores the pos values generated by each of the particle
+        samples= [["" for __ in range(len(sentence)) ] for  _ in range(sample_count)]
+        # print(" Size of samples is {} * {}".format(len(samples),len(samples[0])))
+        # print(samples)
+      
+        all_pos_values= ['adj', 'adv', 'adp', 'conj', 'det', 'noun', 'num', 'pron','prt', 'verb', 'x','.' ]
+
+        ## Randomly assign values for the first sample and from second samples onwards our logic will fill in the values
+
+        for i in range(len(sentence)):
+            samples[0][i]=random.choice(all_pos_values)
+        
+        # print(25/0)
+
+        for itr in range(1,sample_count):
+            samples[itr]=copy.deepcopy(samples[itr-1] )## Assign the pos values that are obtained in the previous iteration 
+
+            for k in range(len(sentence)):
+
+                temp_pos_values= {'adj':{}, 'adv': {}, 'adp':{}, 'conj':{}, 'det':{}, 'noun':{}, 'num':{}, 'pron':{},'prt':{}, 'verb':{}, 'x':{},'.':{} }
+                ## The aim of this of this for loop is that for each of the word we assume that the the other pos values are fixed and obtain the probability distribution for that word
+                ##### Once we have the probabailty distribution then we try to flip a coin to get the parts of speech.
+
+
+                ### To get the distribution we have find proababiity for all pos values, Only once we have that then we can toss a coin or do some random process to get the probabality
+                for each_pos in temp_pos_values.keys():
+
+                    parts_of_speech= copy.deepcopy(samples[itr])
+                    parts_of_speech[k]=each_pos
+
+                    prob_dist=0
+                    for pos_position in range(len(sentence)):
+
+                        if pos_position==0:
+                            P=parts_of_speech[pos_position]
+                            W=sentence[pos_position]
+
+                            if P in self.hmm_S0_prob.keys() and P in self.pos_word_prob.keys():
+                                if W in self.pos_word_prob[P].keys():
+                                    prob_dist=prob_dist-math.log( self.hmm_S0_prob[P] * self.pos_word_prob[P][W])
+                                else:
+                                    prob_dist=prob_dist+99999999
+                            else:
+                                prob_dist=prob_dist+99999999
+
+
+                        elif pos_position==1:
+                            Pi=parts_of_speech[pos_position-1]
+                            Pj=parts_of_speech[pos_position]
+                            W=sentence[pos_position]
+
+                            if Pi in self.hmm_Si_to_Sj_prob.keys() and (Pi,Pj) in self.pos1_pos2_word_prob.keys():
+                                if Pj in self.hmm_Si_to_Sj_prob[Pi].keys():
+                                    if W in self.pos1_pos2_word_prob[(Pi,Pj)].keys():
+                                        prob_dist=prob_dist -math.log( self.hmm_Si_to_Sj_prob[Pi][Pj] * self.pos1_pos2_word_prob[(Pi,Pj)][W])
+                                    else:
+                                        prob_dist=prob_dist+99999999
+                                else:
+                                    prob_dist=prob_dist+99999999     
+                            else:
+                                prob_dist=prob_dist+99999999
+
+                        else:
+                            Pj=parts_of_speech[pos_position]
+                            Pi=parts_of_speech[pos_position-1]
+                            Pi_1=parts_of_speech[pos_position-2]
+                            W=sentence[pos_position]
+
+                            if (Pi,Pi_1) in self.complex_Si_Si_1_to_Sj_prob.keys() and  (Pi,Pj) in self.pos1_pos2_word_prob.keys():
+                                if Pj in self.complex_Si_Si_1_to_Sj_prob[(Pi,Pi_1)].keys():
+                                    if W in self.pos1_pos2_word_prob[(Pi,Pj)].keys():
+                                        prob_dist=prob_dist -math.log( self.complex_Si_Si_1_to_Sj_prob[(Pi,Pi_1)][Pj] * self.pos1_pos2_word_prob[(Pi,Pj)][W])
+                                    else:
+                                        prob_dist=prob_dist+99999999
+                                else:
+                                    prob_dist=prob_dist+99999999    
+                            else:
+                                prob_dist=prob_dist+99999999
+                    temp_pos_values[each_pos]=prob_dist
+                
+                print(temp_pos_values)
+                samples[itr][k]=min(temp_pos_values, key=temp_pos_values.get)
+       
+        pos_final=[]
+        for each in range(len(sentence)):
+            # temp_pos_values= {'adj':{}, 'adv': {}, 'adp':{}, 'conj':{}, 'det':{}, 'noun':{}, 'num':{}, 'pron':{},'prt':{}, 'verb':{}, 'x':{},'.':{} }
+            lst=[x[each] for x in samples]
+            pos_final.append(max(lst,key=lst.count))
+
+                # print("Pradeep Reddy Rokkam")
+
+
+
+        return pos_final
 
 
 
