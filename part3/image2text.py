@@ -47,7 +47,7 @@ test_letters = load_letters(test_img_fname)
 
 def simple_method(test_letters):
     predicted_string = ''
-    
+    n=CHARACTER_WIDTH * CHARACTER_HEIGHT
     for alphabet in test_letters:
         char_probabilities = {}
         for character in TRAIN_LETTERS:
@@ -60,7 +60,7 @@ def simple_method(test_letters):
                         blankspace_match_count += 1
                     else:
                         no_match_count += 1
-            char_probabilities[character] = (0.7 * match_count + 0.2 * blankspace_match_count + 0.1 * no_match_count) / (CHARACTER_WIDTH * CHARACTER_HEIGHT)
+            char_probabilities[character] = (0.95 * match_count + 0.04 * blankspace_match_count + 0.01 * no_match_count) / n
               
         predicted_string +=  max(char_probabilities, key=char_probabilities.get) #https://www.kite.com/python/answers/how-to-find-the-max-value-in-a-dictionary-in-python
         
@@ -113,7 +113,7 @@ def calc_emission_prob(aplhabet, test_letters):
                 blankspace_match_count += 1
             elif test_letters[h][w] != train_letters[aplhabet][h][w]  :
                 no_match_count += 1
-    em_prob = (0.85 * match_count + 0.1 * blankspace_match_count + 0.05 * no_match_count) / n
+    em_prob = (0.95 * match_count + 0.04 * blankspace_match_count + 0.01 * no_match_count) / n
     return math.log(em_prob)
 
 
