@@ -83,12 +83,13 @@ def calc_transition_count(final_sentence_data):
     transition_prob_dict={}
     for sentence_data in final_sentence_data:
         data = " ".join(sentence_data)
-        for first in range(0,len(data)):
-            for next in range(1, len(data)):
-                if (data[first], data[next]) in transition_prob_dict:
-                    transition_prob_dict[data[first], data[next]] += 1
-                else:
-                    transition_prob_dict[data[first], data[next]] = 1
+        for i in range(1,len(data)):  
+            first = i-1
+            next = i         
+            if (data[first], data[next]) in transition_prob_dict:
+                transition_prob_dict[data[first], data[next]] += 1
+            else:
+                transition_prob_dict[data[first], data[next]] = 1
     return transition_prob_dict
 
 def calc_char_count(sentences_list):
@@ -110,34 +111,71 @@ def calc_emission_prob(aplhabet, test_letters):
                 match_count += 1
             elif test_letters[h][w] ==  train_letters[aplhabet][h][w] == ' ':
                 blankspace_match_count += 1
-            elif test_letters[h][w] == train_letters[aplhabet][h][w] == "*" :
+            elif test_letters[h][w] != train_letters[aplhabet][h][w]  :
                 no_match_count += 1
-    em_prob = (0.85 * match_count + 0.135 * blankspace_match_count + 0.015 * no_match_count) / n
+    em_prob = (0.85 * match_count + 0.1 * blankspace_match_count + 0.05 * no_match_count) / n
     return math.log(em_prob)
 
 
+# def train():
+#     final_sentence_data = [] 
+#     for sentence in open(train_txt_fname, 'r'):
+#         sentence_data = tuple([word for word in sentence.split()])
+#         final_sentence_data += [sentence_data]
+#     # print(sentence_data)
+#     sentences_list = [sentence1.strip() for sentence1 in open(train_txt_fname, 'r')]
+#     # print(sentences_list)
+#     initial_state_prob_dict=calc_initial_char_count(final_sentence_data)
+#     transition_prob_dict=calc_transition_count(final_sentence_data)
+#     char_count_dict=calc_char_count(sentences_list)    
+#     for first in TRAIN_LETTERS:
+#         for next in TRAIN_LETTERS:
+#             if (first, next) in transition_prob_dict:
+#                 transition_prob_dict[first, next] = transition_prob_dict[first, next] / char_count_dict[first]
+                
+#             else:
+#                 transition_prob_dict[first, next] = 0.0000000001
+                
+
+#     return [initial_state_prob_dict, char_count_dict, transition_prob_dict]
+
 def train():
-    final_sentence_data = [] 
+    final_sentence_data = []
     for sentence in open(train_txt_fname, 'r'):
-        sentence_data = tuple([word for word in sentence.split()])
+        sentence_carrier=sentence.split()
+        sentence_data = tuple([sentence_carrier[i] for i in range(len(sentence_carrier)) if i%2==0])
         final_sentence_data += [sentence_data]
+    # print("Length of sentence data is ",len(final_sentence_data))
+    # for each in final_sentence_data:
+    #     print(each)
     # print(sentence_data)
-    sentences_list = [sentence1.strip() for sentence1 in open(train_txt_fname, 'r')]
+   
+    # sentences_list = [sentence1.strip() for sentence1 in open(train_txt_fname, 'r')]
+    sentences_list=[]
+    for each in final_sentence_data:
+        sentences_list.append(" ".join(each))
     # print(sentences_list)
+   
     initial_state_prob_dict=calc_initial_char_count(final_sentence_data)
+
+
     transition_prob_dict=calc_transition_count(final_sentence_data)
+
     char_count_dict=calc_char_count(sentences_list)    
+    # for each in char_count_dict:
+    #     print(each,":", char_count_dict)
+    #     print("\n")
+
     for first in TRAIN_LETTERS:
         for next in TRAIN_LETTERS:
             if (first, next) in transition_prob_dict:
                 transition_prob_dict[first, next] = transition_prob_dict[first, next] / char_count_dict[first]
-                
+               
             else:
                 transition_prob_dict[first, next] = 0.0000000001
-                
+               
 
     return [initial_state_prob_dict, char_count_dict, transition_prob_dict]
-
 
 
 def HMM_Viterbi(test_letters, transition_prob_dict):
