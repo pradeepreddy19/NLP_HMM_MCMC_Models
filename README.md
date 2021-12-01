@@ -68,11 +68,11 @@ Note: All the probabilties here are only for numerators and
 
 **Aim** : To recognize text from noisy images of English sentences.
 
-**General approach: -**
+# **General approach: -**
 
 In this problem, we were to use the provided courier-train.png picture as a reference image for all characters (capital and small) along with punctuations to determine the actual difference between this and the noisy image data. In order to predict each character in a given word, we can model it into a HMM problem where the hidden variables are the ones we want to recognize and the observed variables are the sub-image corresponding to each alphabet. We understood the versatility of HMMs through it&#39;s wide area of applications from POS tagging to recognizing text. Here, we can also classify using a simple Naïve Bayes Classifier.
 
-**Challenges &amp; Implementing requirements: -**
+# **Challenges &amp; Implementing requirements: -**
 
 The main challenge was to figure out how to calculate the emission probabilities. One obvious way was to compare the noisy and reference image alphabet-by-alphabet and store the differences in pixels. At first, we tried implementing with the count of pixels that match. In this scenario, we observed that the model predicted the alphabet &quot;e&quot; more often than any other alphabet since this alphabet in general has a high occurrence in the English language and the respective prior probability was dominating over the other values.
 
@@ -82,7 +82,7 @@ We then incorporated the count of matching stars, blank spaces and the count of 
 
 Since the prior probabilities P(Observed Letter) were too dominating, we decided to experiment by considering the likelihood values P (Hidden Letter | Observed Letter) alone to judge which alphabet is most likely to take the place in each word in each sentence.
 
-**Code &amp; Solution explanation: -**
+# **Code &amp; Solution explanation: -**
 
 **Simple Method:**
 
@@ -96,7 +96,7 @@ In order to calculate emission probabilities, we used the same approach as menti
 
 We take positive log of the probabilities and take max of the computed values and store it into the Viterbi table. We then use backtracking to put together the final string based on highest likelihoods.
 
-**Observations and Inferences: -**
+# **Observations and Inferences: -**
 
 As mentioned earlier, we observed that the alphabet &quot;e&quot; was predicted more often while taking prior probabilities into consideration as they were more domination than the likelihood values. The results were better after we considered highest likelihood alone in both the simple naïve bayes as well as HMM Viterbi.
 
