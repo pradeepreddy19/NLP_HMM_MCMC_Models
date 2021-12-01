@@ -34,8 +34,6 @@ def load_training_letters(fname):
     return {TRAIN_LETTERS[i]: letter_images[i] for i in range(0, len(TRAIN_LETTERS))}
 
 
-#####
-# main program
 if len(sys.argv) != 4:
     raise Exception("Usage: python3 ./image2text.py train-image-file.png train-text.txt test-image-file.png")
 
@@ -117,27 +115,6 @@ def calc_emission_prob(aplhabet, test_letters):
     return math.log(em_prob)
 
 
-# def train():
-#     final_sentence_data = [] 
-#     for sentence in open(train_txt_fname, 'r'):
-#         sentence_data = tuple([word for word in sentence.split()])
-#         final_sentence_data += [sentence_data]
-#     # print(sentence_data)
-#     sentences_list = [sentence1.strip() for sentence1 in open(train_txt_fname, 'r')]
-#     # print(sentences_list)
-#     initial_state_prob_dict=calc_initial_char_count(final_sentence_data)
-#     transition_prob_dict=calc_transition_count(final_sentence_data)
-#     char_count_dict=calc_char_count(sentences_list)    
-#     for first in TRAIN_LETTERS:
-#         for next in TRAIN_LETTERS:
-#             if (first, next) in transition_prob_dict:
-#                 transition_prob_dict[first, next] = transition_prob_dict[first, next] / char_count_dict[first]
-                
-#             else:
-#                 transition_prob_dict[first, next] = 0.0000000001
-                
-
-#     return [initial_state_prob_dict, char_count_dict, transition_prob_dict]
 
 def train():
     final_sentence_data = []
@@ -145,16 +122,12 @@ def train():
         sentence_carrier=sentence.split()
         sentence_data = tuple([sentence_carrier[i] for i in range(len(sentence_carrier)) if i%2==0])
         final_sentence_data += [sentence_data]
-    # print("Length of sentence data is ",len(final_sentence_data))
-    # for each in final_sentence_data:
-    #     print(each)
-    # print(sentence_data)
-   
-    # sentences_list = [sentence1.strip() for sentence1 in open(train_txt_fname, 'r')]
+
+
     sentences_list=[]
     for each in final_sentence_data:
         sentences_list.append(" ".join(each))
-    # print(sentences_list)
+
    
     initial_state_prob_dict=calc_initial_char_count(final_sentence_data)
 
@@ -162,9 +135,7 @@ def train():
     transition_prob_dict=calc_transition_count(final_sentence_data)
 
     char_count_dict=calc_char_count(sentences_list)    
-    # for each in char_count_dict:
-    #     print(each,":", char_count_dict)
-    #     print("\n")
+
 
     for first in TRAIN_LETTERS:
         for next in TRAIN_LETTERS:
