@@ -78,7 +78,7 @@ The main challenge was to figure out how to calculate the emission probabilities
 
 We then incorporated the count of matching stars, blank spaces and the count of pixels that did not match. Since each of these have different occurrences, we decided to give each of it a weight corresponding to its frequency of occurrence, i.e. :
 
-**matching stars $>$ matching blank spaces $>$ pixels that do not match (decreasing frequency of occurrence)**
+**matching stars $gt$ matching blank spaces $gt$ pixels that do not match (decreasing frequency of occurrence)**
 
 Since the prior probabilities P(Observed Letter) were too dominating, we decided to experiment by considering the likelihood values P (Hidden Letter | Observed Letter) alone to judge which alphabet is most likely to take the place in each word in each sentence.
 
