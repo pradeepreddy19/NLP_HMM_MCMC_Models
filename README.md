@@ -23,23 +23,40 @@ P(pos/word) = { p(word/pos) * p(pos) } / p(word)
 
 For any given word, we apply the the above formula for all the pos labels and take the one which is having a maxium value. 
 
-NOTE: In the formula to get the posterior probabailty, we ignored the denominator as it is same for all the poslables and we are only interested in getting the pos that has the maximum value 
+NOTE: In the formula to get the posterior probabailty, we ignored the denominator as it is same for all the pos labels and we are only interested in getting the pos that has the maximum value 
+
+Running time: Th execution time for the code to test the given 2000 sentences is under one 1 minute 
 
 Observations:
-* Even though the logic it works extremely well when it comes to the accuracy of the words
-  The acccuacy on the the testing set is almost 91
-  
-
+* Even though the logic is very simple it works extremely well when it comes to the accuracy of the words and does pretty well in identifying the entire sentence as well
+       * The acccuacy for the words on the the testing set is almost 91.76% and the accuracy for the sentences is 37%
+     
 
 ### HMM - Solved Using Viterbi Algorithm:
 
+Training:
+ Along the with the training variables that were used in the Simple model we also need couple of other variables to solve the HMM. The variables that were required are called inital state probabailties and transistion proababities. These are the the probabilties that define the state trasition diagram and these probabilties are useful in the solving the Markov chain which is a special case of the Bayes Net 
+ 
+ Initial State Proababilties:
+ * What is the probabaility that a sentence starts with a particular pos
+ * eg: P(S0=Noun), P(S0=Adv) etc.,
+
+Transition probabailties:
+* What is the proababitiy of trasnition from noun to verb?
+* P(si/Sj), P(Si=Noun/ Sj= Adv) etc.,
+
+Running Time:Just like the simple model the execution time for the code to test the given 2000 sentences is under one 1 minute. Ofcourse it takes slightly more time than the simple model 
+
 Problems:
 * We faced the issue of probabailties becoming very small and due this we were not able to procedd further and the accuracies for the words and sentences was very low 
- *  Resolution: The way how to tackled this problem of small probabalities is to use lograthimc value of those  probabilties 
+ *  Resolution: The way we tackled this problem of small probabalities is to use lograthimc value of those probabilties ( similar methodlogy that was dicussed in the class)
 
 
 ### MCMC - Solved using Gibbs Sampling:
 
+Running Time:Running time is one of the major issues in MCMC implementation. As per the time requirement mentioned in the assignment (code should run under 10 minutes) we were able to run only 75 samples  for each of the sentences. 
+
+Results :
 Pointers:
 75 samples
 taking lot of time for 1000 samples 
