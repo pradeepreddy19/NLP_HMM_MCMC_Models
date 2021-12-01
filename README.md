@@ -12,7 +12,7 @@ a3 created for harmohan-jzayatz-prokkam
 ## **General approach: -**
 In this problem, we were to use the provided bc.train to get all pos taggings for the words  and estimate the required prior probabailties, likelihoods and when a new sentence is provided from the test dataset we have identify its pos taggig for the words along with with log  of posterior probabailties. In order to predict pos tagging for each given word in the sentence, we can model it in three different ways as recommended by the Professor. 
  * We can use a simple model where were calculate the posteroir probabailty P(pos/word) and for all the pos and take the pos that has the maximum probabailty value.  
- * We can also use a HMM problem where the hidden variables (pos tagging) are the ones we want to recognize and the observed variables are the words provided in the sentence.
+ * We can also use a HMM model where the hidden variables (pos tagging) are the ones we want to recognize and the observed variables are the words provided in the sentence.
  * We can also use a comolex model, but this a Bayes Net and not a Markov chain so we cannot apply Viterbi algorithm and in generel if we want to get the correct answer for this problem is NP hard and its way too much time to solve the problem. However, instead we shift our focus to an approximate solution we can solve this problem in reasonable amount of time and this is acheived throught one of the techniques called Gibb's sampling
 
 ### Simple Model:
@@ -62,6 +62,9 @@ Problems:
 
 
 ### MCMC - Solved using Gibbs Sampling:
+
+Algorithm:
+We took a random sample for each of the words and started performimg Gibb's sampling
 
 Running Time:Running time is one of the major issues in MCMC implementation. As per the time requirement mentioned in the assignment (code should run under 10 minutes) we were able to run only 75 samples  for each of the sentences. 
 
