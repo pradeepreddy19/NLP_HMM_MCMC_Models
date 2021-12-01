@@ -4,24 +4,31 @@ a3 created for harmohan-jzayatz-prokkam
 ## Part 1: Part-of-speech tagging:
 
 <b>Aim:</b> Given a new sentence, identify its parts of speech tagging
-
-Training:
-* Need the probabalities of pos 
-  *  Get the frequency of occurance for each and then divide it by the total count to get the pra=obabality for each pos
-    * eg: p(noun), p(adv) etc.,
-* Need Likelihood values:
-  * For a given pos, what is the probabailty of the given word
-    * Get the frequencey of words for a given pos and then divide it by the total count of words that are in the given pos
-      * eg: p(is/pron), p(eai/noun) etc.,
        
 
 ### Simple Model:
 
 Training:
-  * Likelihood values:
-The implementation of this algorithm is very simple as the logic is very simple, we are only using simple Baye's rule to get the pos tagging for any given word
+* Need the probabalities of pos 
+  *  Get the frequency of occurance for each and then divide it by the total count to get the pra=obabality for each pos
+    * eg: p(noun), p(adv) etc.,
+* Need Likelihood values or emission probabailities:
+  * For a given pos, what is the probabailty of the given word
+    * Get the frequencey of words for a given pos and then divide it by the total count of words that are in the given pos
+      * eg: p(is/pron), p(eai/noun) etc.,
+     
+Algorithm:
+The implementation of this algorithm is very simple as the logic is very simple, we are only using simple Baye's rule to get the pos tagging for any given word.
+P(pos/word) = { p(word/pos) * p(pos) } / p(word)
 
-For all the words in all the given sentences our aim to 
+For any given word, we apply the the above formula for all the pos labels and take the one which is having a maxium value. 
+
+NOTE: In the formula to get the posterior probabailty, we ignored the denominator as it is same for all the poslables and we are only interested in getting the pos that has the maximum value 
+
+Observations:
+* Even though the logic it works extremely well when it comes to the accuracy of the words
+  The acccuacy on the the testing set is almost 91
+  
 
 
 ### HMM - Solved Using Viterbi Algorithm:
