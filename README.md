@@ -64,7 +64,7 @@ taking lot of time for 1000 samples
 Note: All the probabilties here are only for numerators and 
 
 
-**Part -3: READING TEXT**
+## **Part -3: READING TEXT**
 
 **Aim** : To recognize text from noisy images of English sentences.
 
