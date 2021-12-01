@@ -47,7 +47,7 @@ To estimate the posterior proababilty for any word  p(pos/word) we need likeliho
      
 ### HMM - Solved Using Viterbi Algorithm:
 
-**Algorithm**:
+**Algorithm**: We used Viterbi Algorthim to solve the HMM. For any given sentence we apply Viterbi Algorithm
 
 
 **Training:**
@@ -61,11 +61,16 @@ Transition probabailties:
 * What is the proababitiy of trasnition from noun to verb?
 * P(si/Sj), P(Si=Noun/ Sj= Adv) etc.,
 
-Running Time:Just like the simple model the execution time for the code to test the given 2000 sentences is under one 1 minute. Ofcourse it takes slightly more time than the simple model 
+**Running Time:** Just like the simple model the execution time for the code to test the given 2000 sentences is under one 1 minute. Ofcourse it takes slightly more time than the simple model but still runs very quickly and takes time that is under 60 seconds
 
-Problems:
+
+**Results**: The acccuacy for the words on the the testing set is almost **95.04%** and the accuracy for the sentences is **54.20%**
+
+**Observations:** HMM does a great job when it comes to accuracy of the words and and the senetnces. This is a great improvement from the the simple model. The running time of the algorithm is under a minute and this again shows that this special case of Bayes Net is very important in solving the problem.
+
+**Problems:**
 * We faced the issue of probabailties becoming very small and due this we were not able to procedd further and the accuracies for the words and sentences was very low 
- *  Resolution: The way we tackled this problem of small probabalities is to use lograthimc value of those probabilties ( similar methodlogy that was dicussed in the class)
+ * ***Resolution***: The way we tackled this problem of small probabalities is to use lograthimc value of those probabilties ( similar methodlogy that was dicussed in the class)
 
 
 ### MCMC - Solved using Gibbs Sampling:
