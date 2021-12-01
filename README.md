@@ -62,3 +62,44 @@ Pointers:
 taking lot of time for 1000 samples 
 
 Note: All the probabilties here are only for numerators and 
+
+
+**Part -3: READING TEXT**
+
+**Aim** : To recognize text from noisy images of English sentences.
+
+**General approach: -**
+
+In this problem, we were to use the provided courier-train.png picture as a reference image for all characters (capital and small) along with punctuations to determine the actual difference between this and the noisy image data. In order to predict each character in a given word, we can model it into a HMM problem where the hidden variables are the ones we want to recognize and the observed variables are the sub-image corresponding to each alphabet. We understood the versatility of HMMs through it&#39;s wide area of applications from POS tagging to recognizing text. Here, we can also classify using a simple Naïve Bayes Classifier.
+
+**Challenges &amp; Implementing requirements: -**
+
+The main challenge was to figure out how to calculate the emission probabilities. One obvious way was to compare the noisy and reference image alphabet-by-alphabet and store the differences in pixels. At first, we tried implementing with the count of pixels that match. In this scenario, we observed that the model predicted the alphabet &quot;e&quot; more often than any other alphabet since this alphabet in general has a high occurrence in the English language and the respective prior probability was dominating over the other values.
+
+We then incorporated the count of matching stars, blank spaces and the count of pixels that did not match. Since each of these have different occurrences, we decided to give each of it a weight corresponding to its frequency of occurrence, i.e. :
+
+**matching stars \&gt; matching blank spaces \&gt; pixels that don&#39;t match (decreasing frequency of****occurrence)**
+
+Since the prior probabilities P(Observed Letter) were too dominating, we decided to experiment by considering the likelihood values P (Hidden Letter | Observed Letter) alone to judge which alphabet is most likely to take the place in each word in each sentence.
+
+**Code &amp; Solution explanation: -**
+
+**Simple Method:**
+
+As explained above, we took a weighted counts of each of matching stars, matching blank spaces and pixels that don&#39;t match and divided it with the total number of pixels in that character (14\*25). We traversed through each character in every word of a sentence in a test image, compared it with the respective reference image and calculated the probability of each character in that position. We then select the one with the highest probability (likelihood in our case) as the final decision and append it to one final string.
+
+**HMM Viterbi:**
+
+We used the train.txt file from part 1 after removing the POS tags to train and retrieve the initial and transition probabilities. For combinations of transitions not observed, we allocated a small value of 10^-10 in order to avoid KeyErrors and to consider every possibility.
+
+In order to calculate emission probabilities, we used the same approach as mentioned in the Simple Method above that utilizes Naïve Bayes for calculation.
+
+We take positive log of the probabilities and take max of the computed values and store it into the Viterbi table. We then use backtracking to put together the final string based on highest likelihoods.
+
+**Observations and Inferences: -**
+
+As mentioned earlier, we observed that the alphabet &quot;e&quot; was predicted more often while taking prior probabilities into consideration as they were more domination than the likelihood values. The results were better after we considered highest likelihood alone in both the simple naïve bayes as well as HMM Viterbi.
+
+The results were further improved after weights were introduced into the picture. As we changed the weights, we could fine tune the model to perform better. We noticed that &quot;(&quot; would be repeated more often in the place of &quot;i&quot; and spaces. As we fine tuned the weights, the HMM Viterbi model outperformed the simple naïve bayes model. In some cases we could tell that the transition probabilities made a huge difference as we noticed a &quot;b&quot; in front of the word &quot;right&quot; since the word &quot;bright&quot; could have been a common occurrence. &quot;The&quot; would also often become &quot;Them&quot; since the model has knowledge of one state before.
+
+This knowledge of the previous state in HMM Viterbi sometimes ended in a better result than simple naïve bayes and sometimes gave a less accurate result as well.
