@@ -109,7 +109,7 @@ Complex Transition probabailties:
 
 **NOTE**: We may get different accuracies for words and sentences for every run (only for the Complex model). The reason we may get such differences is that we are performing a random experiment once we obtain the probabilty distribution. However, the varince is not huge atleast for this training and test data. The range is between **93%** and **94%** for the words and **43%** to **45%** for the sentences
 
-**ScreenShot of the Results:**
+**Screenshot of the Results:**
  <img width="1440" alt="image" src="https://media.github.iu.edu/user/18258/files/571b8180-52c8-11ec-881e-e96dcfec15d3">
 
 
