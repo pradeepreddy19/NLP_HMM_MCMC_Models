@@ -129,7 +129,7 @@ if __name__ == "__main__":
 
     # compute edge strength mask -- in case it's helpful. Feel free to use this.
     edge_mask = edge_strength(input_image)
-    imageio.imwrite('edges.png', uint8(255 * edge_strength / (amax(edge_strength))))
+    imageio.imwrite('edges.png', uint8(255 * edge_mask / (amax(edge_mask))))
 
     
     
