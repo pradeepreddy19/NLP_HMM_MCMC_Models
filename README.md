@@ -90,7 +90,7 @@ As explained above, we took a weighted counts of each of matching stars, matchin
 
 **HMM Viterbi:**
 
-We used the train.txt file from part 1 after removing the POS tags to train and retrieve the initial and transition probabilities. For combinations of transitions not observed, we allocated a small value of 10^-10 in order to avoid KeyErrors and to consider every possibility.
+We used the train.txt file from part 1 after removing the POS tags to train and retrieve the initial and transition probabilities. For combinations of transitions not observed, we allocated a small value of 1^-10 in order to avoid KeyErrors and to consider every possibility.
 
 In order to calculate emission probabilities, we used the same approach as mentioned in the Simple Method above that utilizes Naïve Bayes for calculation.
 
