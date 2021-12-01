@@ -28,10 +28,10 @@ For any given word, we apply the the above formula for all the pos labels and ta
 To estimate the posterior proababilty for any word  p(pos/word) we need likelihood values and prior probabilities and that is obtained in the training phase
 
 **Training:**
-* *Proir probabalities of pos 
+* *Proir probabalities of pos:* 
   *  Get the frequency of occurance for each pos and then divide it by the total count to get the probabality for each pos
     * eg: p(noun), p(adv) etc.,
-* *Likelihood values or emission probabailities:
+* *Likelihood values or emission probabailities:*
   * For a given pos, what is the probabailty of the given word
     * Get the frequencey of words for a given pos and then divide it by the total count of words that are in the given pos
       * eg: p(is/pron), p(eai/noun) etc.,
