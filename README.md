@@ -37,20 +37,21 @@ To estimate the posterior proababilty for any word  p(pos/word) we need likeliho
       * eg: p(is/pron), p(eai/noun) etc.,
      
 
-**Running time:** Th execution time for the code to test the given 2000 sentences is under one 1 minute for the simple model
+**Running time:** The execution time for the code to test the given 2000 sentences is under one 1 minute for the simple model
+
+**Results**: The acccuacy for the words on the the testing set is almost **91.76%** and the accuracy for the sentences is **37.75%**
 
 **Observations:**
 * Even though the logic is very simple it works extremely well when it comes to the accuracy of the words and does pretty well in identifying the entire sentence as well
-       * The acccuacy for the words on the the testing set is almost **91.76%** and the accuracy for the sentences is **37.75%**
+       
      
-
 ### HMM - Solved Using Viterbi Algorithm:
 
 **Algorithm**:
 
 
-Training:
- Along the with the training variables that were used in the Simple model we also need couple of other variables to solve the HMM. The variables that were required are called inital state probabailties and transistion proababities. These are the the probabilties that define the state trasition diagram and these probabilties are useful in the solving the Markov chain which is a special case of the Bayes Net 
+**Training:**
+Along the with the training variables that were used in the Simple model we also need couple of other variables to solve the HMM. The variables that were required are called inital state probabailties and transistion proababities. These are the the probabilties that define the state trasition diagram and these probabilties are useful in the solving the Markov chain which is a special case of the Bayes Net 
  
  Initial State Proababilties:
  * What is the probabaility that a sentence starts with a particular pos
