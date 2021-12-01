@@ -105,7 +105,9 @@ Complex Transition probabailties:
 
 **Results:** The acccuacy for the words on the the testing set is almost **92.39%** and the accuracy for the sentences is **43.95%**
 
-**Observations**: The model performs better than the simple model but not better than HMM. It could be beacuse of the time constraint of 10 minutes aw we were aonly able to get 75 samples for each of the sentencee
+**Observations**: The model performs better than the simple model but not better than HMM. It could be beacuse of the time constraint of 10 minutes as we were only able to get 75 samples for each of the sentence. We could have obatined more acuuracies if we had taken more samples like in thousands for each sentence as we know that MCMC approximately converges to Bayes Net given in the complex model. If the actual result of the complex model (which is a Bayes Net) gives a resul of 100% then by taking more samples (tending to inifiinity) in Gibb's sampling would give us the result approximately close to 100%
+
+**NOTE**: We may get different accuracies for words and sentences for every run (only for the Complex model). The reason we may get such differences is that we are performing a random experiment once we obtain the probabilty distribution. However, the varince is not huge atleast for this training and test data. The range is between **93%** and **94%** for the words and **43%** to **45%** for the sentences
 
 
 # **Part -3: READING TEXT**
