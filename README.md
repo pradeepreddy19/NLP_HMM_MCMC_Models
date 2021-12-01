@@ -11,37 +11,43 @@ a3 created for harmohan-jzayatz-prokkam
 
 ## **General approach: -**
 In this problem, we were to use the provided bc.train to get all pos taggings for the words  and estimate the required prior probabailties, likelihoods and when a new sentence is provided from the test dataset we have identify its pos taggig for the words along with with log  of posterior probabailties. In order to predict pos tagging for each given word in the sentence, we can model it in three different ways as recommended by the Professor. 
- * We can use a simple model where were calculate the posteroir probabailty P(pos/word) and for all the pos and take the pos that has the maximum probabailty value.  
- * We can also use a HMM model where the hidden variables (pos tagging) are the ones we want to recognize and the observed variables are the words provided in the sentence.
- * We can also use a comolex model, but this a Bayes Net and not a Markov chain so we cannot apply Viterbi algorithm and in generel if we want to get the correct answer for this problem is NP hard and its way too much time to solve the problem. However, instead we shift our focus to an approximate solution we can solve this problem in reasonable amount of time and this is acheived throught one of the techniques called Gibb's sampling
+ * We can use a simple model where we calculate the posteroir probabailty P(pos/word) for all the pos and take the pos that has the maximum posterior probabailty value  
+ * We can also use a HMM model where the hidden variables (pos tagging) are the ones we want to recognize and the observed variables are the words provided in the sentence
+ * We can also use a complex model, but this a Bayes Net and not a Markov chain,so we cannot apply Viterbi algorithm and in general if we want to get the correct answer for this problem it is NP hard as takes way too much time to solve the problem. However, instead we shift our focus to an approximate solution we can solve this problem in reasonable amount of time and this is acheived through one of the techniques called Gibb's sampling
 
 ### Simple Model:
 
-Training:
-* Need the probabalities of pos 
-  *  Get the frequency of occurance for each and then divide it by the total count to get the pra=obabality for each pos
+**Algorithm:**
+The implementation of this algorithm is very simple as the logic is very simple as we are only using simple Baye's rule to get the pos tagging for any given word.
+**P(pos/word) = { p(word/pos) * p(pos) } / p(word)**
+
+For any given word, we apply the the above formula for all the pos labels and take the one which is having a maximuum value given by the formula. 
+
+**NOTE:** In the formula to get the posterior probabailty, we ignored the denominator as it is same for all the pos labels as we are only interested in getting the pos that has the maximum value 
+
+To estimate the posterior proababilty for any word  p(pos/word) we need likelihood values and prior probabilities and that is obtained in the training phase
+
+**Training:**
+* *Proir probabalities of pos 
+  *  Get the frequency of occurance for each pos and then divide it by the total count to get the probabality for each pos
     * eg: p(noun), p(adv) etc.,
-* Need Likelihood values or emission probabailities:
+* *Likelihood values or emission probabailities:
   * For a given pos, what is the probabailty of the given word
     * Get the frequencey of words for a given pos and then divide it by the total count of words that are in the given pos
       * eg: p(is/pron), p(eai/noun) etc.,
      
-Algorithm:
-The implementation of this algorithm is very simple as the logic is very simple, we are only using simple Baye's rule to get the pos tagging for any given word.
-P(pos/word) = { p(word/pos) * p(pos) } / p(word)
 
-For any given word, we apply the the above formula for all the pos labels and take the one which is having a maxium value. 
+**Running time:** Th execution time for the code to test the given 2000 sentences is under one 1 minute for the simple model
 
-NOTE: In the formula to get the posterior probabailty, we ignored the denominator as it is same for all the pos labels and we are only interested in getting the pos that has the maximum value 
-
-Running time: Th execution time for the code to test the given 2000 sentences is under one 1 minute 
-
-Observations:
+**Observations:**
 * Even though the logic is very simple it works extremely well when it comes to the accuracy of the words and does pretty well in identifying the entire sentence as well
-       * The acccuacy for the words on the the testing set is almost 91.76% and the accuracy for the sentences is 37%
+       * The acccuacy for the words on the the testing set is almost **91.76%** and the accuracy for the sentences is **37.75%**
      
 
 ### HMM - Solved Using Viterbi Algorithm:
+
+**Algorithm**:
+
 
 Training:
  Along the with the training variables that were used in the Simple model we also need couple of other variables to solve the HMM. The variables that were required are called inital state probabailties and transistion proababities. These are the the probabilties that define the state trasition diagram and these probabilties are useful in the solving the Markov chain which is a special case of the Bayes Net 
