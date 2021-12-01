@@ -54,7 +54,7 @@ To estimate the posterior proababilty for any word  p(pos/word) we need likeliho
 Along the with the training variables that were used in the Simple model we also need couple of other variables to solve the HMM. The variables that were required are called inital state probabailties and transistion proababities. These are the the probabilties that define the state trasition diagram and these probabilties are useful in the solving the Markov chain which is a special case of the Bayes Net 
  
  Initial State Proababilties:
- * What is the probabaility that a sentence starts with a particular pos
+ * What is the probabaility that a sentence starts with a particular pos?
  * eg: P(S0=Noun), P(S0=Adv) etc.,
 
 Transition probabailties:
@@ -75,17 +75,37 @@ Transition probabailties:
 
 ### MCMC - Solved using Gibbs Sampling:
 
-Algorithm:
-We took a random sample for each of the words and started performimg Gibb's sampling
+**Algorithm:**
+The algorithm that we used to implement the Complex model was using Gibb's sampling. This particular algorithm is little bit complex when compared to the other two models
+ * **Gibss Sampling:**
+  * Initial sample was obtined by taking a random pos for each of the words in a sentence and started performimg Gibb's sampling. We can also the pos tagging that was obtained from the simple model
+  * Repeat: (#  Sample count)
+    * Copy the previous sample to the current sample
+    * Repeat (#Words in a the given sentence)
+      * Find p(pos/word) for each word and assuming all the other words pos is given ( we can get this information from the prvious sample)
+      * The above step gives the probabailty distribution for all the pos
+      * Now toss a #pos sided coin and with probabilty distribution obtained in the previous step
+      * Take the side that has come and assign that pos to the word
+ * Once we have the samples that have all the pos taggings, we can now calculate the pos tagging of each word by simply calculating the proabailty for all pos and take the pos that has the maximum value
 
-Running Time:Running time is one of the major issues in MCMC implementation. As per the time requirement mentioned in the assignment (code should run under 10 minutes) we were able to run only 75 samples  for each of the sentences. 
+**Training:**
+Along the with the training variables that were used in the Simple model and HMM model we also need two more variables toomplement the complex variable.
+ 
+Emission Proababilties:
+ * What is the probabaility that a word gives pos1 and pos0?
+ * eg: P(W/Si,Sj), P(eai/(Noun,Adv), P(Indiana/(Noun,Conj) etc.,
 
-Results :
-Pointers:
-75 samples
-taking lot of time for 1000 samples 
+Complex Transition probabailties:
+* What is the proababitiy of transition from noun,conj to verb?
+* P(Si/(Si-1,Si-2), P(Si=Verb/ Si-1=Conj,Si-2=Noun) etc.,
 
-Note: All the probabilties here are only for numerators and 
+
+**Running Time:** Running time is one of the major issues in MCMC implementation. As per the time requirement mentioned in the assignment (code should run under 10 minutes) we were able to run only 75 samples  for each of the sentences. 
+
+
+**Results:** The acccuacy for the words on the the testing set is almost **92.39%** and the accuracy for the sentences is **43.95%**
+
+**Observations**: The model performs better than the simple model but not better than HMM. It could be beacuse of the time constraint of 10 minutes aw we were aonly able to get 75 samples for each of the sentencee
 
 
 # **Part -3: READING TEXT**
