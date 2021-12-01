@@ -29,13 +29,15 @@ def edge_strength(input_image):
 # - color is a (red, green, blue) color triple (e.g. (255, 0, 0) would be pure red
 # - thickness is thickness of line in pixels
 #
-def draw_boundary(image, y_coordinates, color, thickness):
+def draw_boundary(input_image, y_coordinates, color, thickness):
+    image = input_image.copy()
     for (x, y) in enumerate(y_coordinates):
         for t in range( int(max(y-int(thickness/2), 0)), int(min(y+int(thickness/2), image.size[1]-1 )) ):
             image.putpixel((x, t), color)
     return image
 
-def draw_asterisk(image, pt, color, thickness):
+def draw_asterisk(input_image, pt, color, thickness):
+    image = input_image.copy()
     for (x, y) in [ (pt[0]+dx, pt[1]+dy) for dx in range(-3, 4) for dy in range(-2, 3) if dx == 0 or dy == 0 or abs(dx) == abs(dy) ]:
         if 0 <= x < image.size[0] and 0 <= y < image.size[1]:
             image.putpixel((x, y), color)
@@ -44,12 +46,14 @@ def draw_asterisk(image, pt, color, thickness):
 
 # Save an image that superimposes three lines (simple, hmm, feedback) in three different colors 
 # (yellow, blue, red) to the filename
-def write_output_image(filename, image, simple, hmm, feedback, feedback_pt):
+def write_output_image(filename, input_image, simple, hmm, feedback, feedback_pt):
+    image = input_image.copy()
     new_image = draw_boundary(image, simple, (255, 255, 0), 2)
     new_image = draw_boundary(new_image, hmm, (0, 0, 255), 2)
     new_image = draw_boundary(new_image, feedback, (255, 0, 0), 2)
     new_image = draw_asterisk(new_image, feedback_pt, (255, 0, 0), 2)
     imageio.imwrite(filename, new_image)
+
 
 def bin_probabilites(hidden_state, observation):
     return emission_probs[hidden_state][observation]
@@ -124,7 +128,7 @@ if __name__ == "__main__":
     image_array = array(input_image.convert('L'))
 
     # compute edge strength mask -- in case it's helpful. Feel free to use this.
-    edge_strength = edge_strength(input_image)
+    edge_mask = edge_strength(input_image)
     imageio.imwrite('edges.png', uint8(255 * edge_strength / (amax(edge_strength))))
 
     
