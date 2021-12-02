@@ -4,7 +4,7 @@ a3 created for harmohan-jzayatz-prokkam
 
 ## Part 1: Part-of-speech tagging:
 
-
+***NOTE***: The log probabailties are very samll for Gibbs sampling.
 
 <b>Aim:</b> Given a new sentence, identify its parts of speech tagging
 
@@ -103,15 +103,23 @@ Complex Transition probabailties:
 **Running Time:** Running time is one of the major issues in MCMC implementation. As per the time requirement mentioned in the assignment (code should run under 10 minutes) we were able to run only 75 samples  for each of the sentences. 
 
 
-**Results:** The acccuacy for the words on the the testing set is almost **92.39%** and the accuracy for the sentences is **43.95%**
+**Results:** 
+  * When the inital sample is same as the result from the **simple model**
+      * The acccuacy for the words on the the testing set is almost **92.39%** and the accuracy for the sentences is **43.95%**
+  * When the inital sample is **random pos assignment**
+      * The acccuacy for the words on the the testing set is almost **87.40%** and the accuracy for the sentences is **40.15%**
 
-**Observations**: The model performs better than the simple model but not better than HMM. It could be beacuse of the time constraint of 10 minutes as we were only able to get 75 samples for each of the sentence. We could have obatined more acuuracies if we had taken more samples like in thousands for each sentence as we know that MCMC approximately converges to Bayes Net given in the complex model. If the actual result of the complex model (which is a Bayes Net) gives a resul of 100% then by taking more samples (tending to inifiinity) in Gibb's sampling would give us the result approximately close to 100%
+**Observations**: The model sometimes performs slightly better than the simple model but not better than HMM. It could be because of the time constraint of 10 minutes as we were only able to get 75 samples for each of the sentence. We could have obatined more acuuracies if we had taken more samples like in thousands for each sentence as we know that MCMC approximately converges to Bayes Net given in the complex model. If the actual result of the complex model (which is a Bayes Net) gives a resul of 100% then by taking more samples (tending to inifiinity) in Gibb's sampling would give us the result approximately close to 100%
 
 **NOTE**: We may get different accuracies for words and sentences for every run (only for the Complex model). The reason we may get such differences is that we are performing a random experiment once we obtain the probabilty distribution. However, the varince is not huge atleast for this training and test data. The range is between **93%** and **94%** for the words and **43%** to **45%** for the sentences
 
 **Screenshot of the Results:**
+ *  ***When the initial sample of Gibbs is same as the result of the simple model***
  <img width="1440" alt="image" src="https://media.github.iu.edu/user/18258/files/571b8180-52c8-11ec-881e-e96dcfec15d3">
-
+ 
+ **Screenshot of the Results:**
+  *  ***When the initial sample of Gibbs is a random pos assignment***
+ ![image](https://media.github.iu.edu/user/18258/files/5b569780-52e6-11ec-823c-0868be646437)
 
 ## Part 2:  Ice Tracking
 Note:  I had to run `pip install imageio` on SILO in order to run polar.py
