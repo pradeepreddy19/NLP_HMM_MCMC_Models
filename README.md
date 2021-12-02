@@ -114,6 +114,7 @@ Complex Transition probabailties:
 
 
 ## Part 2:  Ice Tracking
+Note:  I had to run `pip install imageio` on SILO in order to run polar.py
  
 ## Objective and formulation
 The objective of this problem is to inference on a Bayesnet to estimate where the air/ice and rock/ice boundary layers are located in a given image. The approach uses probabilistic models to determine which pixels are more likely to be a boundary or not.
