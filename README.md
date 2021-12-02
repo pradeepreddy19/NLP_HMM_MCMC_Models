@@ -113,48 +113,46 @@ Complex Transition probabailties:
  <img width="1440" alt="image" src="https://media.github.iu.edu/user/18258/files/571b8180-52c8-11ec-881e-e96dcfec15d3">
 
 
-
-# **Part 2:  Ice Tracking**
-
+## Part 2:  Ice Tracking
+ 
 ## Objective and formulation
 The objective of this problem is to inference on a Bayesnet to estimate where the air/ice and rock/ice boundary layers are located in a given image. The approach uses probabilistic models to determine which pixels are more likely to be a boundary or not.
 Three model types used are:
 1. Simple model:  probability of a hidden state is determined by emission probability only
 2. HMM:  probability of s hidden state is determined by probability of previous hidden state, transition probability and emission probability.
 3. HMM with human feedback:  coordinate indicated by user input to assumed to have probability of 1 of being a boundary and probability of 0 of being not a boundary
-
+ 
 ## Description of how program works
-
-The conditional probabilites required for the above described models include the following probability distributions (B = boundary, nB = not boundary):
-* initial probabilities:  P(B) = 0.5, P(nB) = 0.5.  To give equal probability that a pixel could be a a boundary or not.
-* transition probabilites:  P(BB) = 0.9, P(nBB) = 0.1, P(nBB) = 0.1, P(nBnB) = 0.9.  To encourage smoothness of the boundary.  
-* emission probabilites: Are based on value of the edge_strength mask.  Edge Strength values are binned int 9 bins and then assigned a probability based on bin number.  P(bin|B) = [.01,.02,.03,.04,.05,.10,.15,.20,.40].  P(bin|nB)= [.88,.05,.01,.01,.01,.01,.01,.01,.01].    
-
-These values are converted to log probabilites so computation of conditional probabilites are calculated with summations instead of products.
-
-For the __simple model__, non_boundary state emission probabilites are subtracted from boundary state emission probabilites and the location where the difference is greatest is chosen as the location of the boundary.
-
-The __HMM model__ uses the same comparison of probabilites, but compares the conditional probability of the previous state, transition probability, and emission probability.  The Viterbi algorithm is used so only the maxium probability of each hidden state is retained and used to calculate the conditional probabilites of the next state.
-
-The __feedback model__ uses the same HMM/Viterbi algorithm but initially shifts the image left so that the column where the feedback coordinate is becomes the first column.  The initial and emission probabilites for the row indicated by the user is set to 1 for the boundary state probability distribtution and 0 (it's actually set to a very small number so log of 0 does not occur) for the non_boundary state probability distribution.  This should make the model start the boundary at the user feedback coordinates and procede from there.  The model generated boundary is then shifted right to return it to its original position.
-
+ 
+The conditional probabilities required for the above described models include the following probability distributions (B = boundary, nB = not boundary):
+* initial probabilities:  P(B) = 0.5, P(nB) = 0.5.  To give equal probability that a pixel could be a boundary or not.
+* transition probabilities:  P(BB) = 0.9, P(nBB) = 0.1, P(nBB) = 0.1, P(nBnB) = 0.9.  To encourage smoothness of the boundary.  
+* emission probabilities: Are based on the value of the edge_strength mask.  Edge Strength values are binned into 9 bins and then assigned a probability based on bin number.  P(bin|B) = [.01,.02,.03,.04,.05,.10,.15,.20,.40].  P(bin|nB)= [.88,.05,.01,.01,.01,.01,.01,.01,.01].    
+ 
+These values are converted to log probabilities so computation of conditional probabilities are calculated with summations instead of products.
+ 
+For the __simple model__, non_boundary state emission probabilities are subtracted from boundary state emission probabilities and the location where the difference is greatest is chosen as the location of the boundary.
+ 
+The __HMM model__ uses the same comparison of probabilities, but compares the conditional probability of the previous state, transition probability, and emission probability.  The Viterbi algorithm is used so only the maximum probability of each hidden state is retained and used to calculate the conditional probabilities of the next state.
+ 
+The __feedback model__ uses the same HMM/Viterbi algorithm but initially shifts the image left so that the column where the feedback coordinate is becomes the first column.  The initial and emission probabilities for the row indicated by the user is set to 1 for the boundary state probability distribution and 0 (it's actually set to a very small number so log of 0 does not occur) for the non_boundary state probability distribution.  This should make the model start the boundary at the user feedback coordinates and procede from there.  The model generated boundary is then shifted right to return it to its original position.
+ 
 ## Discussion (assumptions, results, challenges)
 Assumptions:  
 * The air/ice boundary is always above the ice/rock boundary.  The buffer we chose to use was 30 pixels in order to account for the thickness of the air/ice boundary.  
 * each boundary layer extends the width of the image
 * the higher the edge_strength value, the higher the probability that that pixel is part of a boundary
-* The noise the in the image occurs mostly in non_boundary states and have lower edge_strength values.  
-
-With theese assumptions and the models described above, our model produced the following boundaries for the test images. 
-
- <img width="1440" alt="Boundaries drawn on Test Images" src="https://github.iu.edu/cs-b551-fa2021/harmohan-jzayatz-prokkam-a3/blob/202f887cdf74eb4d1135229d612793687bebee1b/part2/collage.png">
-
+* The noise in the image occurs mostly in non_boundary states and have lower edge_strength values.  
+ 
+With these assumptions and the models described above, our model produced the following boundaries for the test images. 
+ 
+<img width="1440" alt="Boundaries drawn on Test Images" src="https://github.iu.edu/cs-b551-fa2021/harmohan-jzayatz-prokkam-a3/blob/202f887cdf74eb4d1135229d612793687bebee1b/part2/collage.png">
+ 
 Results:  
 The model was able to generate smooth, reasonable boundaries for some parts of some images.  It performed better on air/ice boundaries since those are more distinct and have less vertical variation. Ice/rock layers in images 16.png and 23.png were not as well generated.  It also appears that some pixels are in unexpected locations.  
-
+ 
 Challenges:     
 The results show that the models could be improved to generate smoother boundaries and be able to discriminate boundaries that go through regions of noise that occur as what looks like vertical smudges that decrease the edge_strengh values.  
-
 
 
 # **Part -3: READING TEXT**
