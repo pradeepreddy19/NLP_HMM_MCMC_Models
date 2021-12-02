@@ -147,7 +147,7 @@ Assumptions:
 
 With theese assumptions and the models described above, our model produced the following boundaries for the test images. 
 
-###insert collage image####
+ <img width="1440" alt="Boundaries drawn on Test Images" src="https://github.iu.edu/cs-b551-fa2021/harmohan-jzayatz-prokkam-a3/blob/202f887cdf74eb4d1135229d612793687bebee1b/part2/collage.png">
 
 Results:  
 The model was able to generate smooth, reasonable boundaries for some parts of some images.  It performed better on air/ice boundaries since those are more distinct and have less vertical variation. Ice/rock layers in images 16.png and 23.png were not as well generated.  It also appears that some pixels are in unexpected locations.  
