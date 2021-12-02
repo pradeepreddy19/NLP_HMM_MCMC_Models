@@ -166,7 +166,7 @@ The results show that the models could be improved to generate smoother boundari
 
 # **Part -3: READING TEXT**
 
-***NOTE**: we trained the the data on bc.train. This assumes that each word is followed by its pos tagging
+***NOTE*** : we trained the the data on bc.train. This assumes that each word is followed by its pos tagging
 
 **Aim** : To recognize text from noisy images of English sentences.
 
