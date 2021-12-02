@@ -26,39 +26,18 @@ class Solver:
         # print("The label value is ",label)
         if model == "Simple":
             # print(sentence)
-            return self.simple_neg_log_prob_sentence
-            self.pos_of_sentence=[]
-            self.pos_prob_of_sentece=[]
-            # print("The type of sentence is ", type(sentence))
-
-            for word in sentence:
-                word_prob={'adj':{}, 'adv': {}, 'adp':{}, 'conj':{}, 'det':{}, 'noun':{}, 'num':{}, 'pron':{},'prt':{}, 'verb':{}, 'x':{},'.':{} }
-                # print("Word in Sentence is :",word)
-                for pos in self.pos_prob.keys():
-                    if word in self.pos_word_prob[pos].keys():
-                        word_prob[pos]=self.pos_word_prob[pos][word]*self.pos_prob[pos]
-                    else:
-                         word_prob[pos]=0
-
-                self.pos_prob_of_sentece.append(max(word_prob.values()))
-            
-            return( sum([math.log(x) for x in self.pos_prob_of_sentece if x!=0]))
-
-            
-            # # Throwing an Zero Division Error So that code stops ( Please Remove this before the submission)
-            # print(25/0)
-            return -999
+            return -self.simple_neg_log_prob_sentence
         elif model == "HMM":
-            return self.hmm_neg_log_prob
+            return -self.hmm_neg_log_prob
         elif model == "Complex":
-            return self.complex_neg_log_prob
+            return -self.complex_neg_log_prob
         else:
             print("Unknown algo!")
 
     # Do the training!
     #
     def train(self, data):
-        print(len(data))
+        # print(len(data))
         self.pos_count={}
 
 
@@ -223,7 +202,7 @@ class Solver:
             for word in self.pos1_pos2_word_count[each].keys():
                 self.pos1_pos2_word_prob[each][word]=self.pos1_pos2_word_count[each][word]/total
 
-        print(self.hmm_S0_prob)
+        # print(self.hmm_S0_prob)
         # print(self.hmm_Si_to_Sj_prob)
         # for each in self.hmm_Si_to_Sj_count.keys():
         #     print( each," : ", self.hmm_Si_to_Sj_count[each])
@@ -234,9 +213,9 @@ class Solver:
         # print(self.pos_count)
         # print(self.pos_prob)
         # print("__"*50)
-        for each in self.complex_Si_Si_1_to_Sj_count:
-            print(each , "::", self.complex_Si_Si_1_to_Sj_count[each])
-            print(each , "::", self.complex_Si_Si_1_to_Sj_prob[each])
+        # for each in self.complex_Si_Si_1_to_Sj_count:
+        #     print(each , "::", self.complex_Si_Si_1_to_Sj_count[each])
+        #     print(each , "::", self.complex_Si_Si_1_to_Sj_prob[each])
         # # Validate the counts in complex transition dictionary
         # validate_count=0
         # for each in self.complex_Si_Si_1_to_Sj_count:
@@ -450,7 +429,7 @@ class Solver:
                             try:
                                 prob_dist=prob_dist* self.hmm_S0_prob[P] * self.pos_word_prob[P][W]
                             except KeyError:
-                                prob_dist=prob_dist*0
+                                prob_dist=prob_dist*0.000000000001
                             
                         elif pos_position==1:
                             Pi=parts_of_speech[pos_position-1]
@@ -460,7 +439,7 @@ class Solver:
                             try:
                                 prob_dist=prob_dist * self.hmm_Si_to_Sj_prob[Pi][Pj] * self.pos1_pos2_word_prob[(Pi,Pj)][W]
                             except KeyError:
-                                prob_dist=prob_dist*0
+                                prob_dist=prob_dist*0.000000000001
                                 
                         else:
                             Pj=parts_of_speech[pos_position]
@@ -471,7 +450,7 @@ class Solver:
                             try:
                                 prob_dist=prob_dist* self.complex_Si_Si_1_to_Sj_prob[(Pi_1,Pi)][Pj] * self.pos1_pos2_word_prob[(Pi,Pj)][W]
                             except:
-                                prob_dist=prob_dist*0
+                                prob_dist=prob_dist*0.000000000001
                                 
                     temp_pos_values[each_pos]=prob_dist
 
@@ -502,16 +481,52 @@ class Solver:
                         break
                         # samples[itr][k]=max(temp_pos_values, key=temp_pos_values.get)
        
+       
+
         pos_final=[]
-        self.complex_neg_log_prob=0
+        
         for each in range(len(sentence)):
             # temp_pos_values= {'adj':{}, 'adv': {}, 'adp':{}, 'conj':{}, 'det':{}, 'noun':{}, 'num':{}, 'pron':{},'prt':{}, 'verb':{}, 'x':{},'.':{} }
             lst=[x[each] for x in samples]
             final_pos=max(lst,key=lst.count)
             pos_final.append(final_pos)
             freq=sum([1 for k in lst if k==final_pos])
+        
             # print(freq)
-            self.complex_neg_log_prob=self.complex_neg_log_prob - math.log(freq/sample_count)
+        self.complex_neg_log_prob=0
+       
+       ##########The following code estimate the negative log probabities for the word
+        for i in range(len(pos_final)):
+            if i==0:
+                P=pos_final[i]
+                W=sentence[i]
+                try:
+                    prob_dist=prob_dist* self.hmm_S0_prob[P] * self.pos_word_prob[P][W]
+                except KeyError:
+                    prob_dist=prob_dist*0.000000000001
+            elif i==1:
+                Pi=pos_final[i-1]
+                Pj=pos_final[i]
+                W=sentence[i]
+                try:
+                    prob_dist=prob_dist* self.hmm_S0_prob[P] * self.pos_word_prob[P][W]
+                except KeyError:
+                    prob_dist=prob_dist*0.000000000001
+            else:
+                Pj=pos_final[i]
+                Pi=pos_final[i-1]
+                Pi_1=pos_final[i-2]
+                W=sentence[i]
+
+                try:
+                    prob_dist=prob_dist* self.complex_Si_Si_1_to_Sj_prob[(Pi_1,Pi)][Pj] * self.pos1_pos2_word_prob[(Pi,Pj)][W]
+                except:
+                    prob_dist=prob_dist*0.000000000001
+            try:
+                self.complex_neg_log_prob=self.complex_neg_log_prob - math.log(prob_dist)
+            except:
+                self.complex_neg_log_prob=self.complex_neg_log_prob + 1
+       
                 # print("Pradeep Reddy Rokkam")
 
 
