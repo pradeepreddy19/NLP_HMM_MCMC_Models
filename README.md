@@ -4,7 +4,7 @@ a3 created for harmohan-jzayatz-prokkam
 
 ## Part 1: Part-of-speech tagging:
 
-***NOTE***: The log probabailties are very small for Gibbs sampling.
+***NOTE***: The log probabailties are sometimes high as the prior proabailties and the emission probabailities are too small values in Complex model Gibbs sampling.
 
 <b>Aim:</b> Given a new sentence, identify its parts of speech tagging
 
